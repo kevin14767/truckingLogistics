@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Alert } from 'react-native';
 import { initializeApp } from 'firebase/app';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import {
   initializeAuth,
   getReactNativePersistence,
@@ -21,7 +22,13 @@ import {
   Timestamp
 } from 'firebase/firestore';
 
+
 // Replace with your Firebase config
+GoogleSignin.configure({
+  iosClientId: '109641224107-qeear70iu9183fcl29r1le38bpnklupe.apps.googleusercontent.com',
+  webClientId: '109641224107-bov0hmctvj2td85cmb9rnda27fjac6ls.apps.googleusercontent.com',
+  offlineAccess: true,
+});
 
 const firebaseConfig = {
     apiKey: "AIzaSyA-HFg6UA20VVyr-IyT5x1wniPFisK4J3k",
@@ -55,25 +62,35 @@ type AuthContextType = {
   register: (email: string, password: string, fname: string, lname: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>; 
+  googleLogin: () => Promise<void>;
+
 };
 
 
 const handleAuthError = (error: any) => {
-  console.log('Detailed error information:', {
-    errorCode: error.code,
-    errorMessage: error.message,
+  console.log('Auth error:', {
+    code: error.code,
+    message: error.message,
     fullError: JSON.stringify(error, null, 2)
   });
-  
-  if (error?.response) {
-    console.log('Error response:', error.response);
+
+  let errorMessage = 'An error occurred during sign in';
+
+  switch (error.code) {
+    case 'SIGN_IN_CANCELLED':
+      errorMessage = 'Sign in was cancelled';
+      break;
+    case 'IN_PROGRESS':
+      errorMessage = 'Sign in is already in progress';
+      break;
+    case 'PLAY_SERVICES_NOT_AVAILABLE':
+      errorMessage = 'Google Play Services is not available';
+      break;
+    default:
+      errorMessage = error.message;
   }
 
-  if (error.code === 'SIGN_IN_CANCELLED') {
-    console.log('User cancelled the sign-in flow');
-  } else if (error.code === 'IN_PROGRESS') {
-    console.log('Sign-in is already in progress');
-  }
+  Alert.alert('Error', errorMessage);
 };
 
 
@@ -170,6 +187,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const googleLogin = async () => {
+    try {
+      setLoading(true);
+      
+      // Sign out from any existing Google session
+      await GoogleSignin.signOut();
+
+      // Start Google Sign In flow
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      
+      // Get tokens
+      const { accessToken } = await GoogleSignin.getTokens();
+      
+      // Create Firebase credential
+      const credential = GoogleAuthProvider.credential(
+        userInfo.data?.idToken,
+        accessToken
+      );
+
+      // Sign in to Firebase
+      const result = await signInWithCredential(auth, credential);
+
+      // Check/create Firestore user document
+      if (result.user) {
+        const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+          
+        if (!userDoc.exists()) {
+          const newUser = {
+            uid: result.user.uid,
+            fname: result.user.displayName?.split(' ')[0] || '',
+            lname: result.user.displayName?.split(' ').slice(1).join(' ') || '',
+            email: result.user.email || '',
+            createdAt: Timestamp.now(),
+          };
+
+          await setDoc(doc(db, 'users', result.user.uid), newUser);
+        }
+      }
+    } catch (error: any) {
+      handleAuthError(error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const resetPassword = async (email: string) => {
     try {
       setLoading(true);
@@ -193,6 +257,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         register,
         logout,
         resetPassword,
+        googleLogin,
       }}
     >
       {children}

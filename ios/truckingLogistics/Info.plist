@@ -27,8 +27,15 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>myapp</string>
-          <string>com.kevin14767.truckingLogistics</string>
+          <string>truckingLogistics</string>
+          <string>com.googleusercontent.apps.109641224107-qeear70iu9183fcl29r1le38bpnklupe</string>
+          <string>com.kevinbarcenas.TruckingLogisticsPro</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>com.googleusercontent.apps.109641224107-o3kpjbtel71fhmeo8rflufr9r7ptd8kr</string>
         </array>
       </dict>
     </array>

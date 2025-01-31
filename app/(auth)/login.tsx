@@ -19,7 +19,7 @@ import { useAuth } from '@/src/context/AuthContext';
 export default function LoginScreen() {
   const router = useRouter();
   // const { googleLogin, login } = useContext(AuthContext);
-  const { login, loading, resetPassword } = useAuth(); //
+  const { login, loading, googleLogin } = useAuth(); //
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +32,15 @@ export default function LoginScreen() {
 
     try {
       await login(email, password);
+      router.replace("/(app)/reports");
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await googleLogin();
       router.replace("/(app)/reports");
     } catch (error: any) {
       alert(error.message);
@@ -92,8 +101,9 @@ export default function LoginScreen() {
             buttonTitle={t('signInWithGoogle')}
             btnType="google"
             color="#004d40"
-            backgroundColor="#ffffff"
-            // onPress={googleLogin}
+            backgroundColor={Colors.white}
+            onPress={handleGoogleLogin}
+            disabled={loading}
           />
         </View>
 

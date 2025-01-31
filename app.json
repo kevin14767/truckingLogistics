@@ -5,18 +5,28 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "truckingLogistics",
+    "scheme": [
+      "truckingLogistics",
+      "com.googleusercontent.apps.109641224107-qeear70iu9183fcl29r1le38bpnklupe"
+    ],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.kevin14767.truckingLogistics"
+      "bundleIdentifier": "com.kevinbarcenas.TruckingLogisticsPro",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "config": {
+        "googleSignIn": {
+          "reservedClientId": "com.googleusercontent.apps.109641224107-qeear70iu9183fcl29r1le38bpnklupe"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.kevin14767.truckingLogistics"
     },
     "web": {
       "bundler": "metro",
