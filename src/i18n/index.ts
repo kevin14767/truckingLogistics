@@ -76,7 +76,66 @@ const resources = {
       // onboarding
       welcome: 'Welcome to TruckingLogisticsPro',
       selectLanguage: 'Choose your preferred language',
-      chooseLater: 'You can change the language later in settings'
+      chooseLater: 'You can change the language later in settings',
+
+      // Home Screen
+      welcomeTitle: 'Welcome to Truck Logistics Pro!',
+      welcomeSubtitle: 'Your one-stop app for managing truck logistics.',
+      recentActivity: 'Recent Activity',
+      lastReceipt: 'Last Receipt: Delivered 2 hours ago',
+      maintenanceCheck: 'Maintenance Check: 3 days left',
+      oilChange: 'Next Oil Change: 200 miles remaining',
+      quickAccess: 'Quick Access',
+      viewReceipts: 'View All Receipts',
+      manageFleet: 'Manage Fleet',
+      statistics: 'Statistics',
+      activeTrucks: 'Active Trucks',
+      income: 'Income',
+      avgDelivery: 'Avg Delivery',
+
+
+      // Reports Screen
+      receipts: 'Receipts',
+      searchReceipts: 'Search receipts...',
+      fuel: 'Fuel',
+      maintenance: 'Maintenance',
+      approved: 'Approved',
+      pending: 'Pending',
+      viewDetails: 'View Details',
+      uploadReceipt: 'Upload Receipt',
+
+      // Stats Screen
+      fleetOverview: 'Fleet Performance Overview',
+      week: 'Week',
+      month: 'Month',
+      year: 'Year',
+      totalTrips: 'Total Trips',
+      activeVehicles: 'Active Vehicles',
+      avgDistance: 'Avg Distance',
+      fuelUsage: 'Fuel Usage',
+      performanceMetrics: 'Performance Metrics',
+      vehicleMaintenance: 'Vehicle Maintenance',
+      routeEfficiency: 'Route Efficiency',
+      onTimeDelivery: 'On-Time Delivery',
+
+
+      // Settings Screen
+      editProfile: 'Edit Profile',
+      logOut: 'Log Out',
+      defaultName: 'John Doe',
+      defaultEmail: 'john.doe@mail.com',
+      unknownLocation: 'Unknown Location',      
+
+      // ... existing translations ...
+      phone: 'Phone',
+      country: 'Country',
+      city: 'City',
+      state: 'State',
+      update: 'Update',
+      profileUpdated: 'Your profile has been updated successfully.',
+      updateFailed: 'Something went wrong while updating your profile.',
+
+      //nav
     }
   },
   es: {
@@ -137,7 +196,7 @@ const resources = {
       // Navigation
       home: 'INICIO',
       reports: 'INFORMES',
-      stats: 'ESTADÍSTICAS',
+      stats: 'DATA',
       settings: 'AJUSTES',
       // Settings
       languagePreference: 'Preferencia de Idioma',
@@ -151,7 +210,62 @@ const resources = {
       darkMode: 'Modo Oscuro',
       location: 'Ubicación',
       emailNotifications: 'Notificaciones por Correo',
-      pushNotifications: 'Notificaciones Push'
+      pushNotifications: 'Notificaciones Push',
+
+      // Home Screen
+      welcomeTitle: '¡Bienvenido a Truck Logistics Pro!',
+      welcomeSubtitle: 'Tu aplicación todo en uno para gestionar la logística de camiones.',
+      recentActivity: 'Actividad Reciente',
+      lastReceipt: 'Último Recibo: Entregado hace 2 horas',
+      maintenanceCheck: 'Revisión de Mantenimiento: 3 días restantes',
+      oilChange: 'Próximo Cambio de Aceite: 200 millas restantes',
+      quickAccess: 'Acceso Rápido',
+      viewReceipts: 'Ver Todos los Recibos',
+      manageFleet: 'Gestionar Flota',
+      statistics: 'Estadísticas',
+      activeTrucks: 'Camiones Activos',
+      income: 'Ingresos',
+      avgDelivery: 'Tiempo Promedio de Entrega',
+
+
+      // Reports Screen
+      receipts: 'Recibos',
+      searchReceipts: 'Buscar recibos...',
+      fuel: 'Combustible',
+      maintenance: 'Mantenimiento',
+      approved: 'Aprobado',
+      pending: 'Pendiente',
+      viewDetails: 'Ver Detalles',
+      uploadReceipt: 'Subir Recibo',
+
+      // Stats Screen
+      fleetOverview: 'Resumen de Rendimiento de Flota',
+      week: 'Semana',
+      month: 'Mes',
+      year: 'Año',
+      totalTrips: 'Viajes Totales',
+      activeVehicles: 'Vehículos Activos',
+      avgDistance: 'Distancia Promedio',
+      fuelUsage: 'Uso de Combustible',
+      performanceMetrics: 'Métricas de Rendimiento',
+      vehicleMaintenance: 'Mantenimiento de Vehículos',
+      routeEfficiency: 'Eficiencia de Ruta',
+      onTimeDelivery: 'Entregas a Tiempo',
+
+      // Settings Screen
+      editProfile: 'Editar Perfil',
+      logOut: 'Cerrar Sesión',
+      defaultName: 'Juan Pérez',
+      defaultEmail: 'juan.perez@mail.com',
+      unknownLocation: 'Ubicación Desconocida',     
+      // ... existing translations ...
+      phone: 'Teléfono',
+      country: 'País',
+      city: 'Ciudad',
+      state: 'Estado',
+      update: 'Actualizar',
+      profileUpdated: 'Tu perfil ha sido actualizado exitosamente.',
+      updateFailed: 'Algo salió mal al actualizar tu perfil.',
     }
   }
 };

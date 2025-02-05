@@ -5,19 +5,16 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": [
-      "truckingLogistics",
-      "com.googleusercontent.apps.109641224107-qeear70iu9183fcl29r1le38bpnklupe"
-    ],
+    "scheme": "com.kevin14767.truckingLogistics",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.kevinbarcenas.TruckingLogisticsPro",
+      "bundleIdentifier": "com.kevin14767.truckingLogistics",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "googleSignIn": {
-          "reservedClientId": "com.googleusercontent.apps.109641224107-qeear70iu9183fcl29r1le38bpnklupe"
+          "reservedClientId": "com.googleusercontent.apps.109641224107-uf20r2grrc2nq7p4bopl1o7djqc18rnk"
         }
       }
     },
@@ -36,6 +33,12 @@
     "plugins": [
       "expo-router",
       [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.109641224107-uf20r2grrc2nq7p4bopl1o7djqc18rnk"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
@@ -44,10 +47,17 @@
           "backgroundColor": "#ffffff"
         }
       ]
-    ],
-    "experiments": {
+    ],    "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "e51bc337-3d5d-4e99-a19f-96fce61917de"
+      }
     }
   }
 }

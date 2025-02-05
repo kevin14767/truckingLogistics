@@ -18,15 +18,15 @@ import { useAuth } from '@/src/context/AuthContext';
 
 export default function LoginScreen() {
   const router = useRouter();
-  // const { googleLogin, login } = useContext(AuthContext);
   const { login, loading, googleLogin } = useAuth(); //
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert("Error, 'Please fill in all fields");
+      alert("Error, Please fill in all fields");
       return;
     }
 
@@ -40,10 +40,12 @@ export default function LoginScreen() {
 
   const handleGoogleLogin = async () => {
     try {
+      setIsGoogleLoading(true);
       await googleLogin();
-      router.replace("/(app)/reports");
+      router.replace("/(app)/home");
     } catch (error: any) {
-      alert(error.message);
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -82,14 +84,14 @@ export default function LoginScreen() {
           />
           
           <TouchableOpacity 
-            // style={styles.forgotButton} 
+            style={styles.forgotButton} 
             onPress={() => router.push("/(auth)/forgot-password")}
           >
             <Text style={styles.forgotButtonText}>{t('forgotPassword')}</Text>
           </TouchableOpacity>
 
           <FormButton 
-            buttonTitle={loading ? t('signingIn') : t('signIn')}
+            buttonTitle={t('signIn')}
             onPress={handleLogin}
             disabled={loading}
           />
@@ -103,9 +105,9 @@ export default function LoginScreen() {
             color="#004d40"
             backgroundColor={Colors.white}
             onPress={handleGoogleLogin}
-            disabled={loading}
-          />
-        </View>
+            disabled={isGoogleLoading}
+          />        
+          </View>
 
         <TouchableOpacity
           style={styles.createAccountButton}
@@ -149,8 +151,13 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: moderateScale(16),
-    color: Colors.grey,
+    color: Colors.white, // Changed to darker shade for better readability
     marginTop: verticalScale(12),
+    marginHorizontal: horizontalScale(20), // Added side margins for better layout
+    lineHeight: moderateScale(24), // Added for better text spacing
+    letterSpacing: 0.3, // Subtle letter spacing for elegance
+    textAlign: 'center', // Centers the text nicely
+    opacity: 0.9, // Slightly softens the text
   },
   formContainer: {
     width: '100%',
@@ -197,4 +204,13 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: 'bold',
   },
+  forgotButton: {
+    marginVertical: verticalScale(8),
+    paddingHorizontal: horizontalScale(4),
+    opacity: 0.8,
+    color: Colors.darkGrey,
+    fontSize: moderateScale(14),
+    fontFamily: 'System', // Or your app's preferred font family 
+    textAlign: 'center'
+  }
 });

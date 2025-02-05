@@ -39,19 +39,19 @@ export default function LanguageScreen() {
           />
           <Text style={styles.title}>Trucking Logistics Pro</Text>
           <Text style={styles.subtitle}>
-            {t('selectLanguage')}
+            {'Choose your preferred language'}
           </Text>
         </View>
         <View style={styles.formContainer}>
           <FormButton
-            buttonTitle={t('english')}
+            buttonTitle={'English'}
             onPress={() => handleLanguageChange('en')}
-            backgroundColor={currentLang === 'en' ? Colors.greenThemeColor : Colors.grey}
+            backgroundColor={Colors.greenThemeColor}
           />
           <FormButton
-            buttonTitle={t('spanish')}
+            buttonTitle={'Spanish'}
             onPress={() => handleLanguageChange('es')}
-            backgroundColor={currentLang === 'es' ? Colors.greenThemeColor : Colors.grey}
+            backgroundColor={Colors.grey}
           />
         </View>
         <View style={styles.footerContainer}>

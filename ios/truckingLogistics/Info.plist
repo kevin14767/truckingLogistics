@@ -27,15 +27,20 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>truckingLogistics</string>
-          <string>com.googleusercontent.apps.109641224107-qeear70iu9183fcl29r1le38bpnklupe</string>
-          <string>com.kevinbarcenas.TruckingLogisticsPro</string>
+          <string>com.kevin14767.truckingLogistics</string>
+          <string>com.kevin14767.truckingLogistics</string>
         </array>
       </dict>
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.googleusercontent.apps.109641224107-o3kpjbtel71fhmeo8rflufr9r7ptd8kr</string>
+          <string>com.googleusercontent.apps.109641224107-uf20r2grrc2nq7p4bopl1o7djqc18rnk</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>exp+truckinglogistics</string>
         </array>
       </dict>
     </array>
@@ -52,6 +57,12 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+    <key>NSCameraUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your camera</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your microphone</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your photos</string>
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>

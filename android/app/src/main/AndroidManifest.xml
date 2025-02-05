@@ -1,6 +1,7 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -24,9 +25,9 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="truckingLogistics"/>
-        <data android:scheme="com.googleusercontent.apps.109641224107-qeear70iu9183fcl29r1le38bpnklupe"/>
         <data android:scheme="com.kevin14767.truckingLogistics"/>
+        <data android:scheme="com.kevin14767.truckingLogistics"/>
+        <data android:scheme="exp+truckinglogistics"/>
       </intent-filter>
     </activity>
   </application>

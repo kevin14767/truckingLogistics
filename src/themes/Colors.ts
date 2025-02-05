@@ -8,6 +8,7 @@ const Colors = {
     offWhite: '#f3f3ec',
     greenThemeColor: '#004d40',
     thirdOnboardingColor : '#00796b',
+    error: '#FF3B30',  // Adding error color - a bright red that works well in both light and dark modes
 } as const;
   
 export default Colors;

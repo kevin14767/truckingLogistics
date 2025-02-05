@@ -1,10 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 import Onboarding from "react-native-onboarding-swiper";
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { horizontalScale, verticalScale, moderateScale, Colors } from "../../src/themes";
-
 
 interface DotsProps {
   selected: boolean;
@@ -39,7 +39,6 @@ const Next = ({ ...props }) => {
   );
 };
 
-
 const Done = ({ ...props }) => {
   const { t } = useTranslation();
   return (
@@ -52,6 +51,17 @@ const Done = ({ ...props }) => {
 export default function OnboardingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+
+  const handleOnboardingComplete = async () => {
+    try {
+      // Set the onboarding flag in AsyncStorage
+      await AsyncStorage.setItem("onboardingCompleted", "true");
+      // Navigate to the login screen
+      router.replace("/(auth)/login");
+    } catch (error) {
+      console.error("Error saving onboarding status:", error);
+    }
+  };
 
   const pages = [
     {
@@ -101,13 +111,12 @@ export default function OnboardingScreen() {
       NextButtonComponent={Next}
       DoneButtonComponent={Done}
       DotComponent={Dots}
-      onSkip={() => router.push("/(auth)/login")}
-      onDone={() => router.push("/(auth)/login")}
+      onSkip={handleOnboardingComplete} // Call handleOnboardingComplete when skipped
+      onDone={handleOnboardingComplete} // Call handleOnboardingComplete when finished
       pages={pages}
     />
   );
 }
-
 
 const styles = StyleSheet.create({
   button: {
@@ -131,7 +140,7 @@ const styles = StyleSheet.create({
   },
   selectedDot: {
     backgroundColor: "#ffffff",
-    transform: [{scale: 1.2}],
+    transform: [{ scale: 1.2 }],
   },
   unselectedDot: {
     backgroundColor: "rgba(255, 255, 255, 0.5)",

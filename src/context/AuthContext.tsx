@@ -2,6 +2,8 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Alert } from 'react-native';
 import { initializeApp } from 'firebase/app';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { useRouter } from "expo-router";
+
 import {
   initializeAuth,
   getReactNativePersistence,
@@ -24,20 +26,7 @@ import {
 
 
 // Replace with your Firebase config
-GoogleSignin.configure({
-  iosClientId: '109641224107-qeear70iu9183fcl29r1le38bpnklupe.apps.googleusercontent.com',
-  webClientId: '109641224107-bov0hmctvj2td85cmb9rnda27fjac6ls.apps.googleusercontent.com',
-  offlineAccess: true,
-});
 
-const firebaseConfig = {
-    apiKey: "AIzaSyA-HFg6UA20VVyr-IyT5x1wniPFisK4J3k",
-    authDomain: "truckinglogistics-b28e6.firebaseapp.com",  
-    projectId: "truckinglogistics-b28e6",
-    storageBucket: "truckinglogistics-b28e6.firebasestorage.app",
-    messagingSenderId: "109641224107",
-    appId: "1:109641224107:web:bf3c59fb6ab7a5b8784cee"
-};
   
 
 // Initialize Firebase
@@ -45,7 +34,7 @@ const app = initializeApp(firebaseConfig);
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage)
 });
-const db = getFirestore(app);
+export const db = getFirestore(app);
 
 type User = {
   uid: string;
@@ -55,16 +44,30 @@ type User = {
   createdAt: Timestamp;
 };
 
+type UserData = {
+  email?: string;
+  fname?: string;
+  lname?: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  state?: string;
+};
+
 type AuthContextType = {
   user: User | null;
+  userData: UserData | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fname: string, lname: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>; 
   googleLogin: () => Promise<void>;
-
+  isOnboardingCompleted: boolean | null;
+  completeOnboarding: () => Promise<void>;
 };
+
+
 
 
 const handleAuthError = (error: any) => {
@@ -98,20 +101,62 @@ const handleAuthError = (error: any) => {
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [isOnboardingCompleted, setIsOnboardingCompleted] = useState<boolean | null>(null);
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true); // Add loading state
 
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      try {
+        const value = await AsyncStorage.getItem("onboardingCompleted");
+        setIsOnboardingCompleted(value === "true");
+      } catch (error) {
+        console.error("Error checking onboarding status:", error);
+        setIsOnboardingCompleted(false);
+      }
+    };
+    
+    checkOnboardingStatus();
+  }, []);
+
+  // Existing onAuthStateChanged useEffect remains the same
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-        setUser(userDoc.data());
+        const userData = userDoc.data();
+        
+        if (userData) {
+          setUser({
+            uid: user.uid,
+            email: userData.email || '',
+            fname: userData.fname || '',
+            lname: userData.lname || '',
+            createdAt: userData.createdAt
+          });
+  
+          setUserData({
+            email: userData.email,
+            fname: userData.fname,
+            lname: userData.lname,
+            phone: userData.phone,
+            country: userData.country,
+            city: userData.city,
+            state: userData.state
+          });
+        } else {
+          setUser(null);
+          setUserData(null);
+        }
       } else {
         setUser(null);
+        setUserData(null);
       }
       setLoading(false);
     });
-
+  
     return unsubscribe;
   }, []);
 
@@ -179,6 +224,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setLoading(true);
       await signOut(auth);
+      setUser(null);      // Add this to ensure user state is cleared
+      setUserData(null);  // Add this to ensure userData is cleared
+      router.replace("/(auth)/login"); // Add this to force navigation
     } catch (error: any) {
       handleAuthError(error);
       throw error;
@@ -248,16 +296,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const completeOnboarding = async () => {
+    try {
+      await AsyncStorage.setItem("onboardingCompleted", "true");
+      setIsOnboardingCompleted(true);
+      router.replace("/(auth)/login");
+    } catch (error) {
+      console.error("Error setting onboarding status:", error);
+      Alert.alert('Error', 'Could not complete onboarding');
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
+        userData,
         loading,
         login,
         register,
         logout,
         resetPassword,
         googleLogin,
+        isOnboardingCompleted, // Add this to the context
+        completeOnboarding, // Add this method to the context
       }}
     >
       {children}
