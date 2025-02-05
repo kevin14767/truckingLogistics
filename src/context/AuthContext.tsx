@@ -26,7 +26,20 @@ import {
 
 
 // Replace with your Firebase config
+GoogleSignin.configure({
+  iosClientId: '109641224107-uf20r2grrc2nq7p4bopl1o7djqc18rnk.apps.googleusercontent.com', // Updated to new client ID
+  webClientId: '109641224107-bov0hmctvj2td85cmb9rnda27fjac6ls.apps.googleusercontent.com',
+  offlineAccess: true,
+});
 
+const firebaseConfig = {
+  apiKey: "AIzaSyA-HFg6UA20VVyr-IyT5x1wniPFisK4J3k",
+  authDomain: "truckinglogistics-b28e6.firebaseapp.com",
+  projectId: "truckinglogistics-b28e6",
+  storageBucket: "truckinglogistics-b28e6.firebasestorage.app",
+  messagingSenderId: "109641224107",
+  appId: "1:109641224107:web:bf3c59fb6ab7a5b8784cee"
+};
   
 
 // Initialize Firebase

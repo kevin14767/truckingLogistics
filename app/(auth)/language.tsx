@@ -11,7 +11,7 @@ import {
 import { useRouter } from "expo-router";
 import { useTranslation } from 'react-i18next';
 import { Colors, horizontalScale, verticalScale, moderateScale } from '../../src/themes';
-import FormButton from '../../src/components/FormButton';
+import FormButton from '@/src/components/forms/FormButton';
 
 export default function LanguageScreen() {
   const router = useRouter();

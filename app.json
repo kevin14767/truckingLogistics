@@ -46,7 +46,16 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+        
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to upload receipts.",
+          "cameraPermission": "Allow Truck Logistics Pro to access your camera"
+        }
       ]
+
     ],    "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true

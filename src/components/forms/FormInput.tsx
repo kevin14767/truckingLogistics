@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, TextInputProps } from 'react-native';
-import { Colors, horizontalScale, verticalScale, moderateScale } from '../themes';
+import { Colors, horizontalScale, verticalScale, moderateScale } from '@/src/themes';
 import { AntDesign } from '@expo/vector-icons';
 
 interface FormInputProps extends TextInputProps {

@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { Colors, moderateScale, horizontalScale, verticalScale } from '../../../src/themes';
-import FormButton from "../../../src/components/FormButton";
+import FormButton from "@/src/components/forms/FormButton";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../../src/context/AuthContext";
 import { doc, updateDoc, getDoc } from 'firebase/firestore';

@@ -1,8 +1,9 @@
+//initial postscreen
 import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, horizontalScale, verticalScale, moderateScale } from '../../src/themes';
+import { Colors, horizontalScale, verticalScale, moderateScale } from "@/src/themes";
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function PostScreen() {
@@ -11,13 +12,14 @@ export default function PostScreen() {
 
   const handleSelectImage = async () => {
     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images', 'videos'],
         allowsEditing: true,
-        aspect: [9, 16],
+        aspect: [1080, 1920],
         quality: 1,
+        base64: true,
       });
-
+      console.log(result);
       if (!result.canceled) {
         setSelectedImage(result.assets[0].uri);
       }
@@ -50,7 +52,7 @@ export default function PostScreen() {
 
   const handleProcess = () => {
     if (selectedImage) {
-      router.push({ pathname: "/home", params: { uri: selectedImage }});
+      router.push({ pathname: "/camera/imagedetails", params: { uri: selectedImage }});
     }
   };
 
@@ -105,17 +107,27 @@ const styles = StyleSheet.create({
   },
   imagePreview: {
     width: '100%',
-    height: '65%', // Keep the original height
-    
+    height: '50%', // Reduced slightly to make room for buttons
+    marginTop: verticalScale(50), // Added top margin
   },
   processImage: {
+    position: 'absolute',
+    bottom: verticalScale(120), // Position it above the tab bar
     backgroundColor: Colors.greenThemeColor,
     padding: moderateScale(15),
     borderRadius: moderateScale(10),
     alignItems: 'center',
     justifyContent: 'center',
     width: '80%',
-    marginTop: verticalScale(20),
+    zIndex: 999, // Ensure it's always on top
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   retakeButton: {
     position: 'absolute',
@@ -124,6 +136,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.greenThemeColor,
     padding: moderateScale(10),
     borderRadius: moderateScale(20),
+    zIndex: 999,
   },
   buttonText: {
     color: Colors.white,

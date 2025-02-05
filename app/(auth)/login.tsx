@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { useRouter } from "expo-router";
 import { Colors, horizontalScale, verticalScale, moderateScale } from '../../src/themes';
-import FormButton from '@/src/components/FormButton';
-import FormInput from '@/src/components/FormInput';
-import SocialButton from '@/src/components/SocialButton';
+import FormButton from '@/src/components/forms/FormButton';
+import FormInput from '@/src/components/forms/FormInput';
+import SocialButton from '@/src/components/forms/SocialButton';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/src/context/AuthContext';
 

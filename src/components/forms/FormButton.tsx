@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, TouchableOpacityProps } from 'react-native';
-import { Colors, horizontalScale, verticalScale, moderateScale } from '../themes';
+import { Colors, verticalScale, horizontalScale, moderateScale } from '@/src/themes';
 
 interface FormButtonProps extends TouchableOpacityProps {
   buttonTitle: string;

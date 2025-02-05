@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, StyleSheet, TouchableOpacityProps } from 'react-native';
-import { windowHeight, windowWidth } from '../themes/Dimensions';
+import { windowHeight, windowWidth } from '@/src/themes/Dimensions';
 import { FontAwesome } from '@expo/vector-icons';
 
 interface SocialButtonProps extends TouchableOpacityProps {
