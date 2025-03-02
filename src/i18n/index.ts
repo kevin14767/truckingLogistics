@@ -20,6 +20,24 @@ const resources = {
       onboardingTitle3: 'Stay on Track',
       onboardingSubtitle3: 'Real-time navigation and scheduling for efficient deliveries.',
 
+
+  // en: {
+      extractText: 'Extract Text',
+      processingImage: 'Processing Image',
+      recognizedText: 'Recognized Text',
+      verifyImage: 'Verify Image',
+  // },
+  // es: {
+  //   extractText: 'Extraer Texto',
+  //   processingImage: 'Procesando Imagen',
+  //   recognizedText: 'Texto Reconocido',
+  //   verifyImage: 'Verificar Imagen'
+  // }
+
+
+
+
+
       // Login Screen
       welcomeBack: 'Welcome back!',
       email: 'Email',
@@ -167,6 +185,15 @@ const resources = {
       noAccount: '¿No tienes una cuenta?',
       signUpLink: 'Regístrate',
       or: 'O',
+
+
+      extractText: 'Extraer Texto',
+      processingImage: 'Procesando Imagen',
+      recognizedText: 'Texto Reconocido',
+      verifyImage: 'Verificar Imagen',
+
+
+
 
       // Signup Screen
       createAccount: 'Crear una Cuenta',

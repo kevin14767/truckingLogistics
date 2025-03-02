@@ -13,6 +13,6 @@ export type VerificationData = {
 export type CameraStackParamList = {
   index: undefined;
   imagedetails: { uri: string };
-  verification: { imageData: any };
+  verification: { imageData: string }; // Contains uri and recognizedText as JSON string
   report: { verificationData: string }; // Serialized VerificationData
 };

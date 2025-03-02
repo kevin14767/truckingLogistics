@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CameraStackParamList } from '@/src/types/camera_navigation';
 import { Colors, moderateScale, verticalScale, horizontalScale } from '../../../src/themes';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 type VerificationItem = {
   id: string;
@@ -13,8 +14,13 @@ type VerificationItem = {
 };
 
 export default function VerificationScreen() {
-  const { imageData } = useLocalSearchParams<CameraStackParamList['verification']>();
+  const params = useLocalSearchParams<CameraStackParamList['verification']>();
   const router = useRouter();
+  const { t } = useTranslation();
+  
+  // Parse the imageData
+  const imageData = params.imageData ? JSON.parse(params.imageData) : { uri: '', recognizedText: '' };
+  
   const [verificationItems, setVerificationItems] = useState<VerificationItem[]>([
     { id: '1', title: 'Document Clarity', verified: false },
     { id: '2', title: 'Document Type', verified: false },
@@ -32,10 +38,8 @@ export default function VerificationScreen() {
 
   const handleSubmit = () => {
     const verificationData = {
-      verificationResults: JSON.stringify({
-        results: verificationItems,
-        imageData
-      }),
+      verificationResults: verificationItems,
+      imageData: imageData,
       timestamp: new Date().toISOString()
     };
   
@@ -53,8 +57,17 @@ export default function VerificationScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialIcons name="arrow-back" size={24} color={Colors.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Verify Document</Text>
+        <Text style={styles.headerTitle}>{t('verifyDocument', 'Verify Document')}</Text>
       </View>
+
+      {imageData.recognizedText && (
+        <View style={styles.ocrSection}>
+          <Text style={styles.ocrTitle}>{t('recognizedText', 'Recognized Text')}:</Text>
+          <ScrollView style={styles.ocrScrollView}>
+            <Text style={styles.ocrText}>{imageData.recognizedText}</Text>
+          </ScrollView>
+        </View>
+      )}
 
       <ScrollView style={styles.content}>
         {verificationItems.map(item => (
@@ -81,7 +94,7 @@ export default function VerificationScreen() {
         onPress={handleSubmit}
         disabled={!verificationItems.every(item => item.verified)}
       >
-        <Text style={styles.submitButtonText}>Generate Report</Text>
+        <Text style={styles.submitButtonText}>{t('generateReport', 'Generate Report')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -108,7 +121,6 @@ const styles = StyleSheet.create({
     marginLeft: horizontalScale(16),
   },
   content: {
-    flex: 1,
     padding: moderateScale(16),
   },
   verificationItem: {
@@ -144,4 +156,25 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(16),
     fontWeight: 'bold',
   },
+  ocrSection: {
+    margin: moderateScale(16),
+    padding: moderateScale(16),
+    backgroundColor: Colors.darkGrey,
+    borderRadius: moderateScale(10),
+    maxHeight: verticalScale(150),
+  },
+  ocrTitle: {
+    color: Colors.white,
+    fontSize: moderateScale(16),
+    fontWeight: 'bold',
+    marginBottom: verticalScale(8),
+  },
+  ocrScrollView: {
+    maxHeight: verticalScale(100),
+  },
+  ocrText: {
+    color: Colors.white,
+    fontSize: moderateScale(14),
+    lineHeight: moderateScale(20),
+  }
 });
