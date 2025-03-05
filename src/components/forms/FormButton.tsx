@@ -1,23 +1,32 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, TouchableOpacityProps } from 'react-native';
-import { Colors, verticalScale, horizontalScale, moderateScale } from '@/src/themes';
+import { 
+  Colors, 
+  verticalScale, 
+  horizontalScale, 
+  moderateScale, 
+  Typography, 
+  Spacing, 
+  BorderRadius, 
+  Shadow 
+} from '@/src/themes';
 
 interface FormButtonProps extends TouchableOpacityProps {
   buttonTitle: string;
   backgroundColor?: string;
 }
 
-const FormButton: React.FC<FormButtonProps> = ({ 
-  buttonTitle, 
-  backgroundColor, 
-  ...rest 
+const FormButton: React.FC<FormButtonProps> = ({
+  buttonTitle,
+  backgroundColor,
+  ...rest
 }) => {
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[
-        styles.buttonContainer, 
+        styles.buttonContainer,
         backgroundColor && { backgroundColor }
-      ]} 
+      ]}
       {...rest}
     >
       <Text style={styles.buttonText}>{buttonTitle}</Text>
@@ -27,26 +36,19 @@ const FormButton: React.FC<FormButtonProps> = ({
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    marginVertical: verticalScale(10),
+    marginVertical: Spacing.m,
     width: '100%',
     height: verticalScale(50),
-    backgroundColor: Colors.greenThemeColor,
-    borderRadius: moderateScale(8),
+    backgroundColor: Colors.primary.main,
+    borderRadius: BorderRadius.medium,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...Shadow.medium,
   },
   buttonText: {
-    fontSize: moderateScale(18),
+    fontSize: Typography.button.fontSize,
     fontWeight: '600',
-    color: Colors.white,
+    color: Colors.text.primary,
     letterSpacing: 0.5,
   },
 });

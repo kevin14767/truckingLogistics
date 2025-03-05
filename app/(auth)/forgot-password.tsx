@@ -7,7 +7,7 @@ import {
   TouchableOpacity 
 } from 'react-native';
 import { useRouter } from "expo-router";
-import { Colors, horizontalScale, verticalScale, moderateScale } from '../../src/themes';
+import { Colors,horizontalScale, verticalScale, moderateScale, Spacing  } from '@/src/themes';
 import FormButton from '@/src/components/forms/FormButton';
 import FormInput from '@/src/components/forms/FormInput';
 import { useTranslation } from 'react-i18next';
@@ -68,11 +68,11 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
  safeArea: {
    flex: 1,
-   backgroundColor: Colors.black_grey,
+   backgroundColor: Colors.background.main,
  },
  container: {
    flex: 1,
-   padding: horizontalScale(20),
+   padding: Spacing.m,
  },
  backButton: {
  },

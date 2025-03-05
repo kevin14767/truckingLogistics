@@ -4,7 +4,15 @@ import { useRouter } from "expo-router";
 import Onboarding from "react-native-onboarding-swiper";
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { horizontalScale, verticalScale, moderateScale, Colors } from "../../src/themes";
+import { 
+  Colors, 
+  Typography, 
+  Spacing, 
+  BorderRadius,
+  horizontalScale, 
+  verticalScale, 
+  moderateScale 
+} from "@/src/themes";
 
 interface DotsProps {
   selected: boolean;
@@ -65,7 +73,7 @@ export default function OnboardingScreen() {
 
   const pages = [
     {
-      backgroundColor: Colors.black_grey,
+      backgroundColor: Colors.background.main,
       image: (
         <Image
           source={require("../../assets/icons/trucking_logistics.png")}
@@ -78,7 +86,7 @@ export default function OnboardingScreen() {
       subTitleStyles: styles.subtitle,
     },
     {
-      backgroundColor: Colors.darkGrey,
+      backgroundColor: Colors.background.card,
       image: (
         <Image
           source={require("../../assets/icons/pngwing.com(1).png")}
@@ -91,7 +99,7 @@ export default function OnboardingScreen() {
       subTitleStyles: styles.subtitle,
     },
     {
-      backgroundColor: Colors.greenThemeColor,
+      backgroundColor: Colors.primary.main,
       image: (
         <Image
           source={require("../../assets/icons/pngwing.com(2).png")}
@@ -111,8 +119,8 @@ export default function OnboardingScreen() {
       NextButtonComponent={Next}
       DoneButtonComponent={Done}
       DotComponent={Dots}
-      onSkip={handleOnboardingComplete} // Call handleOnboardingComplete when skipped
-      onDone={handleOnboardingComplete} // Call handleOnboardingComplete when finished
+      onSkip={handleOnboardingComplete}
+      onDone={handleOnboardingComplete}
       pages={pages}
     />
   );
@@ -120,26 +128,26 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   button: {
-    marginHorizontal: horizontalScale(20),
-    paddingVertical: verticalScale(12),
-    paddingHorizontal: horizontalScale(16),
-    borderRadius: moderateScale(8),
+    marginHorizontal: Spacing.l,
+    paddingVertical: Spacing.s,
+    paddingHorizontal: Spacing.m,
+    borderRadius: BorderRadius.medium,
   },
   buttonText: {
-    fontSize: moderateScale(15),
-    color: "#ffffff",
-    fontWeight: "600",
-    letterSpacing: moderateScale(0.1),
+    fontSize: moderateScale(16),
+    fontWeight: '600',
+    color: Colors.text.primary,
+    letterSpacing: 0.1,
   },
   dot: {
     width: moderateScale(10),
     height: moderateScale(10),
-    borderRadius: moderateScale(5),
-    marginHorizontal: horizontalScale(5),
-    marginBottom: verticalScale(16),
+    borderRadius: BorderRadius.circle(10),
+    marginHorizontal: Spacing.xs,
+    marginBottom: Spacing.m,
   },
   selectedDot: {
-    backgroundColor: "#ffffff",
+    backgroundColor: Colors.text.primary,
     transform: [{ scale: 1.2 }],
   },
   unselectedDot: {
@@ -151,19 +159,20 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   title: {
-    fontSize: moderateScale(24),
-    fontWeight: "700",
-    color: "#ffffff",
+    fontSize: moderateScale(18),
+    fontWeight: '600',
+    lineHeight: moderateScale(24),
+    color: Colors.text.primary,
     textAlign: "center",
-    marginBottom: verticalScale(16),
-    paddingHorizontal: horizontalScale(20),
+    marginBottom: Spacing.m,
+    paddingHorizontal: Spacing.l,
   },
   subtitle: {
-    fontSize: moderateScale(16),
+    ...Typography.body.large,
     color: "rgba(255, 255, 255, 0.9)",
     textAlign: "center",
     lineHeight: moderateScale(24),
-    paddingHorizontal: horizontalScale(40),
-    marginBottom: verticalScale(24),
+    paddingHorizontal: Spacing.xxl,
+    marginBottom: Spacing.l,
   },
 });

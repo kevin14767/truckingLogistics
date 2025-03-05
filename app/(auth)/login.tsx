@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -9,7 +9,16 @@ import {
   SafeAreaView 
 } from 'react-native';
 import { useRouter } from "expo-router";
-import { Colors, horizontalScale, verticalScale, moderateScale } from '../../src/themes';
+import { 
+  Colors, 
+  Typography, 
+  Spacing, 
+  BorderRadius, 
+  Shadow,
+  horizontalScale, 
+  verticalScale, 
+  moderateScale 
+} from '@/src/themes';
 import FormButton from '@/src/components/forms/FormButton';
 import FormInput from '@/src/components/forms/FormInput';
 import SocialButton from '@/src/components/forms/SocialButton';
@@ -18,7 +27,7 @@ import { useAuth } from '@/src/context/AuthContext';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login, loading, googleLogin } = useAuth(); //
+  const { login, loading, googleLogin } = useAuth();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
@@ -44,12 +53,12 @@ export default function LoginScreen() {
       await googleLogin();
       router.replace("/(app)/home");
     } catch (error: any) {
+      // Error handling
     } finally {
       setIsGoogleLoading(false);
     }
   };
 
-  
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView 
@@ -102,12 +111,12 @@ export default function LoginScreen() {
           <SocialButton
             buttonTitle={t('signInWithGoogle')}
             btnType="google"
-            color="#004d40"
+            color={Colors.primary.main}
             backgroundColor={Colors.white}
             onPress={handleGoogleLogin}
             disabled={isGoogleLoading}
           />        
-          </View>
+        </View>
 
         <TouchableOpacity
           style={styles.createAccountButton}
@@ -125,92 +134,73 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.black_grey,
+    backgroundColor: Colors.background.main,
   },
   container: {
     flexGrow: 1,
-    paddingHorizontal: horizontalScale(20),
-    paddingTop: verticalScale(40),
-    paddingBottom: verticalScale(20),
+    paddingHorizontal: Spacing.l,
+    paddingTop: Spacing.xxl,
+    paddingBottom: Spacing.l,
   },
   headerContainer: {
     alignItems: 'center',
-    marginBottom: verticalScale(30),
+    marginBottom: Spacing.xl,
   },
   logo: {
     height: moderateScale(120),
     width: moderateScale(120),
     resizeMode: 'cover',
-    borderRadius: moderateScale(60),
+    borderRadius: BorderRadius.circle(120),
   },
   title: {
     fontSize: moderateScale(28),
-    fontWeight: 'bold',
-    color: Colors.white,
-    marginTop: verticalScale(15),
+    fontWeight: '700',
+    lineHeight: moderateScale(34),
+    color: Colors.text.primary,
+    marginTop: Spacing.m,
   },
   subtitle: {
-    fontSize: moderateScale(16),
-    color: Colors.white, // Changed to darker shade for better readability
-    marginTop: verticalScale(12),
-    marginHorizontal: horizontalScale(20), // Added side margins for better layout
-    lineHeight: moderateScale(24), // Added for better text spacing
-    letterSpacing: 0.3, // Subtle letter spacing for elegance
-    textAlign: 'center', // Centers the text nicely
-    opacity: 0.9, // Slightly softens the text
+    ...Typography.body.large,
+    color: Colors.text.primary,
+    marginTop: Spacing.s,
+    marginHorizontal: Spacing.l,
+    textAlign: 'center',
+    opacity: 0.9,
+    letterSpacing: 0.3,
   },
   formContainer: {
     width: '100%',
-    marginBottom: verticalScale(5),
+    marginBottom: Spacing.xs,
   },
-  forgotPasswordContainer: {
-    width: '100%',
-    alignItems: 'flex-end',
-    marginVertical: verticalScale(15),
+  forgotButton: {
+    marginVertical: Spacing.s,
+    paddingHorizontal: Spacing.xs,
+    opacity: 0.8,
   },
   forgotButtonText: {
-    color: Colors.grey,
+    color: Colors.text.secondary,
+    ...Typography.body.large,
     fontWeight: '600',
-    fontSize: moderateScale(16),
     textAlign: 'center',
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: verticalScale(5),
-    paddingHorizontal: horizontalScale(10),
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.grey,
   },
   orText: {
-    color: Colors.grey,
-    paddingHorizontal: horizontalScale(10),
-    fontSize: moderateScale(14),
+    color: Colors.text.secondary,
+    paddingHorizontal: Spacing.s,
+    ...Typography.body.medium,
     fontWeight: '600',
     textAlign: 'center',
+    marginVertical: Spacing.s,
   },
   createAccountButton: {
-    marginTop: verticalScale(20),
+    marginTop: Spacing.l,
   },
   createAccountText: {
-    color: Colors.grey,
-    fontSize: moderateScale(14),
+    color: Colors.text.secondary,
+    ...Typography.body.medium,
     textAlign: 'center',
   },
   signUpText: {
-    color: Colors.white,
+    color: Colors.text.primary,
     fontWeight: 'bold',
   },
-  forgotButton: {
-    marginVertical: verticalScale(8),
-    paddingHorizontal: horizontalScale(4),
-    opacity: 0.8,
-    color: Colors.darkGrey,
-    fontSize: moderateScale(14),
-    fontFamily: 'System', // Or your app's preferred font family 
-    textAlign: 'center'
-  }
 });

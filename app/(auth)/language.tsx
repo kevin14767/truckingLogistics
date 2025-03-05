@@ -1,24 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   SafeAreaView,
-  ScrollView,
-  Animated
+  ScrollView
 } from 'react-native';
 import { useRouter } from "expo-router";
 import { useTranslation } from 'react-i18next';
-import { Colors, horizontalScale, verticalScale, moderateScale } from '../../src/themes';
+import { 
+  Colors, 
+  Typography, 
+  Spacing, 
+  horizontalScale, 
+  verticalScale, 
+  moderateScale, 
+  BorderRadius,
+  Shadow 
+} from '../../src/themes';
 import FormButton from '@/src/components/forms/FormButton';
 
 export default function LanguageScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const [currentLang, setCurrentLang] = useState('en');
-
-  // Remove the useEffect that was switching languages
 
   const handleLanguageChange = async (language: string) => {
     setCurrentLang(language);
@@ -39,24 +45,26 @@ export default function LanguageScreen() {
           />
           <Text style={styles.title}>Trucking Logistics Pro</Text>
           <Text style={styles.subtitle}>
-            {'Choose your preferred language'}
+            {t('chooseLanguage', 'Choose your preferred language')}
           </Text>
         </View>
+        
         <View style={styles.formContainer}>
           <FormButton
             buttonTitle={'English'}
             onPress={() => handleLanguageChange('en')}
-            backgroundColor={Colors.greenThemeColor}
+            backgroundColor={currentLang === 'en' ? Colors.primary.main : Colors.gray.dark}
           />
           <FormButton
             buttonTitle={'Spanish'}
             onPress={() => handleLanguageChange('es')}
-            backgroundColor={Colors.grey}
+            backgroundColor={currentLang === 'es' ? Colors.primary.main : Colors.gray.dark}
           />
         </View>
+        
         <View style={styles.footerContainer}>
           <Text style={styles.footerText}>
-            {t('chooseLater')}
+            {t('chooseLater', 'You can change the language later in settings')}
           </Text>
         </View>
       </ScrollView>
@@ -64,49 +72,55 @@ export default function LanguageScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.black_grey,
+    backgroundColor: Colors.background.main,
   },
   container: {
     flexGrow: 1,
-    paddingHorizontal: horizontalScale(20),
-    paddingTop: verticalScale(40),
-    paddingBottom: verticalScale(20),
+    paddingHorizontal: horizontalScale(Spacing.l),
+    paddingTop: verticalScale(Spacing.xl),
+    paddingBottom: verticalScale(Spacing.l),
   },
   headerContainer: {
     alignItems: 'center',
-    marginBottom: verticalScale(30),
+    marginBottom: verticalScale(Spacing.xl),
   },
   logo: {
     height: moderateScale(120),
     width: moderateScale(120),
     resizeMode: 'cover',
-    borderRadius: moderateScale(60),
+    borderRadius: BorderRadius.circle(120),
+    ...Shadow.medium,
   },
   title: {
     fontSize: moderateScale(28),
-    fontWeight: 'bold',
-    color: Colors.white,
-    marginTop: verticalScale(15),
+    fontWeight: '700',
+    lineHeight: moderateScale(34),
+    color: Colors.text.primary,
+    marginTop: verticalScale(Spacing.m),
   },
   subtitle: {
-    fontSize: moderateScale(16),
-    color: Colors.grey,
-    marginTop: verticalScale(5),
+    ...Typography.body.large,
+    color: Colors.text.secondary,
+    marginTop: verticalScale(Spacing.xs),
+    textAlign: 'center',
   },
   formContainer: {
     width: '100%',
-    marginTop: verticalScale(10),
+    marginTop: verticalScale(Spacing.m),
+    gap: verticalScale(Spacing.s),
   },
   footerContainer: {
-    marginTop: verticalScale(20),
+    marginTop: verticalScale(Spacing.l),
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingBottom: verticalScale(Spacing.l),
   },
   footerText: {
-    color: Colors.grey,
-    fontSize: moderateScale(14),
+    color: Colors.text.secondary,
+    ...Typography.body.medium,
     textAlign: 'center',
   }
 });

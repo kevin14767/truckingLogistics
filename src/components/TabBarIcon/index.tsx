@@ -1,5 +1,14 @@
 import { View, Image, Text, StyleSheet } from 'react-native';
-import { Colors, moderateScale, verticalScale, horizontalScale } from '../../themes';
+import {
+  Colors,
+  Typography,
+  Spacing,
+  BorderRadius,
+  Shadow,
+  moderateScale,
+  verticalScale,
+  horizontalScale
+} from '@/src/themes';
 
 interface TabBarIconProps {
   focused: boolean;
@@ -12,12 +21,13 @@ export const TabBarIcon = ({
   focused,
   name,
   iconSource,
-  size = moderateScale(26)  // Increased base size
+  size = moderateScale(26) // Increased base size
 }: TabBarIconProps) => (
   <View style={[
     styles.tabIconContainer,
     focused && styles.tabIconContainerActive
-  ]}><Image
+  ]}>
+    <Image
       source={iconSource}
       style={[
         styles.tabIcon,
@@ -25,12 +35,13 @@ export const TabBarIcon = ({
         focused && styles.tabIconActive
       ]}
     />
-    <Text 
+    <Text
       style={[styles.tabLabel, focused && styles.tabLabelActive]}
       numberOfLines={1}
       ellipsizeMode="tail"
       maxFontSizeMultiplier={1} // Prevents text scaling from accessibility settings
-    >{name}
+    >
+      {name}
     </Text>
   </View>
 );
@@ -48,24 +59,24 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.1 }],
   },
   tabIcon: {
-    tintColor: '#6c6c6e',
+    tintColor: Colors.gray.medium, // Updated from '#6c6c6e'
     opacity: 0.8,
   },
   tabIconActive: {
-    tintColor: Colors.greenThemeColor,
+    tintColor: Colors.primary.main, // Updated from Colors.greenThemeColor
     opacity: 1,
   },
   tabLabel: {
     fontSize: moderateScale(9),
     marginTop: verticalScale(2),
-    color: Colors.grey,
+    color: Colors.gray.light, // Updated from Colors.grey
     fontWeight: '500',
     textAlign: 'center',
     lineHeight: moderateScale(11), // Tight line height
     maxWidth: '100%',
   },
   tabLabelActive: {
-    color: Colors.greenThemeColor,
+    color: Colors.primary.main, // Updated from Colors.greenThemeColor
   },
 });
 

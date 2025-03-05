@@ -1,6 +1,15 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, TextInputProps } from 'react-native';
-import { Colors, horizontalScale, verticalScale, moderateScale } from '@/src/themes';
+import { 
+  Colors, 
+  horizontalScale, 
+  verticalScale, 
+  moderateScale,
+  Typography,
+  Spacing,
+  BorderRadius,
+  Shadow
+} from '@/src/themes';
 import { AntDesign } from '@expo/vector-icons';
 
 interface FormInputProps extends TextInputProps {
@@ -18,7 +27,7 @@ const FormInput: React.FC<FormInputProps> = ({
   return (
     <View style={styles.inputContainer}>
       <View style={styles.iconStyle}>
-        <AntDesign name={iconType} size={moderateScale(25)} color={Colors.grey}/>
+        <AntDesign name={iconType} size={moderateScale(25)} color={Colors.text.secondary}/>
       </View>
       <TextInput
         value={labelValue}
@@ -34,25 +43,18 @@ const FormInput: React.FC<FormInputProps> = ({
 
 const styles = StyleSheet.create({
   inputContainer: {
-    marginVertical: verticalScale(8),
+    marginVertical: Spacing.s,
     width: '100%',
     height: verticalScale(50),
-    borderRadius: moderateScale(8),
+    borderRadius: BorderRadius.medium,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.white,
     overflow: 'hidden',
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    ...Shadow.small,
   },
   iconStyle: {
-    padding: moderateScale(10),
+    padding: Spacing.s,
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
@@ -62,9 +64,9 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    paddingHorizontal: horizontalScale(15),
-    fontSize: moderateScale(16),
-    color: Colors.darkGrey,
+    paddingHorizontal: Spacing.m,
+    fontSize: Typography.body.large.fontSize,
+    color: Colors.background.card,
   },
 });
 

@@ -1,6 +1,13 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, StyleSheet, TouchableOpacityProps } from 'react-native';
-import { windowHeight, windowWidth } from '@/src/themes/Dimensions';
+import { 
+  windowHeight, 
+  windowWidth,
+  moderateScale,
+  Spacing,
+  Typography,
+  BorderRadius
+} from '@/src/themes';
 import { FontAwesome } from '@expo/vector-icons';
 
 interface SocialButtonProps extends TouchableOpacityProps {
@@ -33,15 +40,15 @@ const SocialButton: React.FC<SocialButtonProps> = ({
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    marginTop: 10,
+    marginTop: Spacing.s,
     width: '100%',
     height: windowHeight / 15,
-    padding: 10,
+    padding: Spacing.s,
     flexDirection: 'row',
-    borderRadius: 3,
+    borderRadius: BorderRadius.small,
   },
   iconWrapper: {
-    width: 30,
+    width: moderateScale(30),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -54,7 +61,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: Typography.button.fontSize,
     fontWeight: 'bold',
   },
 });

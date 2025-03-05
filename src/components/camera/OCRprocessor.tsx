@@ -1,7 +1,15 @@
 // src/components/camera/OCRProcessor.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Colors, moderateScale, verticalScale, horizontalScale } from '@/src/themes';
+import { 
+  Colors, 
+  moderateScale, 
+  verticalScale, 
+  horizontalScale,
+  Typography,
+  Spacing,
+  BorderRadius 
+} from '@/src/themes';
 import { useTranslation } from 'react-i18next';
 import { OcrService } from '@/src/services/OcrService';
 
@@ -58,7 +66,7 @@ const OCRProcessor: React.FC<OCRProcessorProps> = ({ imageUri, onTextRecognized 
   return (
     <View style={styles.container}>
       <View style={styles.processingCard}>
-        <ActivityIndicator size="large" color={Colors.greenThemeColor} />
+        <ActivityIndicator size="large" color={Colors.primary.main} />
         <Text style={styles.processingText}>{t('processingImage', 'Processing Image')}</Text>
         <Text style={styles.progressText}>{progress}%</Text>
       </View>
@@ -79,22 +87,22 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   processingCard: {
-    backgroundColor: Colors.darkGrey,
-    padding: moderateScale(20),
-    borderRadius: moderateScale(12),
+    backgroundColor: Colors.background.card,
+    padding: Spacing.l,
+    borderRadius: BorderRadius.medium,
     alignItems: 'center',
     minWidth: horizontalScale(200),
   },
   processingText: {
-    color: Colors.white,
-    fontSize: moderateScale(18),
+    color: Colors.text.primary,
+    fontSize: Typography.header.small.fontSize,
     fontWeight: '500',
-    marginTop: verticalScale(12),
+    marginTop: Spacing.m,
   },
   progressText: {
-    color: Colors.grey,
-    fontSize: moderateScale(16),
-    marginTop: verticalScale(8),
+    color: Colors.text.secondary,
+    fontSize: Typography.body.large.fontSize,
+    marginTop: Spacing.s,
   }
 });
 

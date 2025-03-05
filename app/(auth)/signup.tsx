@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -8,15 +8,20 @@ import {
   SafeAreaView 
 } from 'react-native';
 import { useRouter } from "expo-router";
-import { Colors, horizontalScale, verticalScale, moderateScale } from '../../src/themes';
+import { 
+  Colors, 
+  Typography, 
+  Spacing, 
+  BorderRadius, 
+  horizontalScale, 
+  verticalScale, 
+  moderateScale 
+} from '@/src/themes';
 import FormButton from '@/src/components/forms/FormButton';
 import FormInput from '@/src/components/forms/FormInput';
 import SocialButton from '@/src/components/forms/SocialButton';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/src/context/AuthContext';
-import { use } from 'i18next';
-
-// import { AuthContext } from '../../navigation/AuthProvider';
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -121,7 +126,7 @@ export default function SignupScreen() {
         <SocialButton
           buttonTitle={t('signUpWithGoogle')}
           btnType="google"
-          color="#004d40"
+          color={Colors.primary.main}
           backgroundColor={Colors.white}
           // onPress={googleLogin}
         />
@@ -142,76 +147,58 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.black_grey,
+    backgroundColor: Colors.background.main,
   },
   container: {
     flexGrow: 1,
-    paddingHorizontal: horizontalScale(20),
-    paddingTop: verticalScale(40),
-    paddingBottom: verticalScale(20),
+    paddingHorizontal: Spacing.l,
+    paddingTop: Spacing.xxl,
+    paddingBottom: Spacing.l,
   },
   headerContainer: {
     alignItems: 'center',
-    marginBottom: verticalScale(40),
+    marginBottom: Spacing.xxl,
   },
   title: {
     fontSize: moderateScale(28),
-    fontWeight: 'bold',
-    color: Colors.white,
-    marginBottom: verticalScale(5),
+    fontWeight: '700',
+    lineHeight: moderateScale(34),
+    color: Colors.text.primary,
+    marginBottom: Spacing.xs,
   },
   subtitle: {
-    fontSize: moderateScale(16),
-    color: Colors.grey,
+    ...Typography.body.large,
+    color: Colors.text.secondary,
   },
   formContainer: {
     width: '100%',
-    marginBottom: verticalScale(20),
+    marginBottom: Spacing.l,
   },
   termsContainer: {
-    marginVertical: verticalScale(1),
-    paddingHorizontal: horizontalScale(10),
-    paddingBottom: verticalScale(6),
+    marginVertical: Spacing.xs,
+    paddingHorizontal: Spacing.s,
+    paddingBottom: Spacing.xs,
   },
   termsText: {
-    fontSize: moderateScale(14),
-    color: Colors.grey,
+    ...Typography.body.medium,
+    color: Colors.text.secondary,
     textAlign: 'center',
     lineHeight: moderateScale(20),
   },
   termsLink: {
-    color: Colors.greenThemeColor,
+    color: Colors.primary.main,
     fontWeight: '500',
   },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: verticalScale(5),
-    marginBottom: verticalScale(15),
-    paddingHorizontal: horizontalScale(10),
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.grey,
-  },
-  orText: {
-    color: Colors.grey,
-    paddingHorizontal: horizontalScale(10),
-    fontSize: moderateScale(14),
-    fontWeight: '600',
-  },
   signInButton: {
-    marginTop: verticalScale(20),
+    marginTop: Spacing.l,
   },
   signInText: {
-    color: Colors.grey,
-    fontSize: moderateScale(14),
+    ...Typography.body.medium,
+    color: Colors.text.secondary,
     textAlign: 'center',
   },
   signInLink: {
-    color: Colors.white,
+    color: Colors.text.primary,
     fontWeight: 'bold',
   },
 });
-

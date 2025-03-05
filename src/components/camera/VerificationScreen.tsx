@@ -3,7 +3,16 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CameraStackParamList } from '@/src/types/camera_navigation';
-import { Colors, moderateScale, verticalScale, horizontalScale } from '../../../src/themes';
+import { 
+  Colors, 
+  moderateScale, 
+  verticalScale, 
+  horizontalScale,
+  Typography,
+  Spacing,
+  BorderRadius,
+  Shadow
+} from '@/src/themes';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
@@ -55,7 +64,7 @@ export default function VerificationScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={24} color={Colors.white} />
+          <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('verifyDocument', 'Verify Document')}</Text>
       </View>
@@ -80,7 +89,7 @@ export default function VerificationScreen() {
             <MaterialIcons
               name={item.verified ? "check-circle" : "radio-button-unchecked"}
               size={24}
-              color={item.verified ? Colors.greenThemeColor : Colors.grey}
+              color={item.verified ? Colors.primary.main : Colors.text.secondary}
             />
           </TouchableOpacity>
         ))}
@@ -103,78 +112,78 @@ export default function VerificationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black_grey,
+    backgroundColor: Colors.background.main,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: moderateScale(16),
+    padding: Spacing.m,
     marginTop: verticalScale(40),
   },
   backButton: {
-    padding: moderateScale(8),
+    padding: Spacing.s,
   },
   headerTitle: {
-    color: Colors.white,
-    fontSize: moderateScale(20),
+    color: Colors.text.primary,
+    fontSize: Typography.header.small.fontSize,
     fontWeight: 'bold',
-    marginLeft: horizontalScale(16),
+    marginLeft: Spacing.m,
   },
   content: {
-    padding: moderateScale(16),
+    padding: Spacing.m,
   },
   verificationItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: Colors.darkGrey,
-    padding: moderateScale(16),
-    borderRadius: moderateScale(10),
-    marginBottom: verticalScale(12),
+    backgroundColor: Colors.background.card,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
+    marginBottom: Spacing.m,
   },
   verificationItemActive: {
-    borderColor: Colors.greenThemeColor,
+    borderColor: Colors.primary.main,
     borderWidth: 1,
   },
   itemTitle: {
-    color: Colors.white,
-    fontSize: moderateScale(16),
+    color: Colors.text.primary,
+    fontSize: Typography.body.large.fontSize,
     fontWeight: '500',
   },
   submitButton: {
-    backgroundColor: Colors.grey,
-    padding: moderateScale(16),
-    borderRadius: moderateScale(10),
-    margin: moderateScale(16),
+    backgroundColor: Colors.gray.light,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
+    margin: Spacing.m,
     alignItems: 'center',
   },
   submitButtonActive: {
-    backgroundColor: Colors.greenThemeColor,
+    backgroundColor: Colors.primary.main,
   },
   submitButtonText: {
-    color: Colors.white,
-    fontSize: moderateScale(16),
+    color: Colors.text.primary,
+    fontSize: Typography.button.fontSize,
     fontWeight: 'bold',
   },
   ocrSection: {
-    margin: moderateScale(16),
-    padding: moderateScale(16),
-    backgroundColor: Colors.darkGrey,
-    borderRadius: moderateScale(10),
+    margin: Spacing.m,
+    padding: Spacing.m,
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.medium,
     maxHeight: verticalScale(150),
   },
   ocrTitle: {
-    color: Colors.white,
-    fontSize: moderateScale(16),
+    color: Colors.text.primary,
+    fontSize: Typography.body.large.fontSize,
     fontWeight: 'bold',
-    marginBottom: verticalScale(8),
+    marginBottom: Spacing.s,
   },
   ocrScrollView: {
     maxHeight: verticalScale(100),
   },
   ocrText: {
-    color: Colors.white,
-    fontSize: moderateScale(14),
-    lineHeight: moderateScale(20),
+    color: Colors.text.primary,
+    fontSize: Typography.body.medium.fontSize,
+    lineHeight: Typography.body.medium.lineHeight,
   }
 });

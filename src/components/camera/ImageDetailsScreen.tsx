@@ -3,10 +3,19 @@ import React, { useState } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CameraStackParamList } from '@/src/types/camera_navigation';
-import { Colors, moderateScale, verticalScale, horizontalScale } from '@/src/themes';
+import { 
+  Colors, 
+  moderateScale, 
+  verticalScale, 
+  horizontalScale,
+  BorderRadius, 
+  Spacing, 
+  Typography
+} from '@/src/themes';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import OCRProcessor from './OCRprocessor';
+
 export default function ImageDetailsScreen() {
   const { uri } = useLocalSearchParams<CameraStackParamList['imagedetails']>();
   const router = useRouter();
@@ -41,7 +50,7 @@ export default function ImageDetailsScreen() {
         style={styles.backButton}
         onPress={() => router.back()}
       >
-        <MaterialIcons name="arrow-back" size={24} color={Colors.white} />
+        <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
       </TouchableOpacity>
       
       <Image 
@@ -86,7 +95,7 @@ export default function ImageDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black_grey,
+    backgroundColor: Colors.background.main, // Updated from Colors.black_grey
     alignItems: 'center',
   },
   backButton: {
@@ -95,8 +104,8 @@ const styles = StyleSheet.create({
     left: horizontalScale(20),
     zIndex: 10,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: moderateScale(8),
-    borderRadius: moderateScale(20),
+    padding: Spacing.s, // Updated from moderateScale(8)
+    borderRadius: BorderRadius.pill, // Updated from moderateScale(20)
   },
   image: {
     width: '100%',
@@ -106,47 +115,47 @@ const styles = StyleSheet.create({
   verifyButton: {
     position: 'absolute',
     bottom: verticalScale(40),
-    backgroundColor: Colors.greenThemeColor,
-    padding: moderateScale(15),
-    borderRadius: moderateScale(10),
+    backgroundColor: Colors.primary.main, // Updated from Colors.greenThemeColor
+    padding: Spacing.m, // Updated from moderateScale(15)
+    borderRadius: BorderRadius.medium, // Updated from moderateScale(10)
     width: '80%',
     alignItems: 'center',
   },
   ocrButton: {
     position: 'absolute',
     bottom: verticalScale(100),
-    backgroundColor: Colors.darkGrey,
-    padding: moderateScale(15),
-    borderRadius: moderateScale(10),
+    backgroundColor: Colors.background.card, // Updated from Colors.darkGrey
+    padding: Spacing.m, // Updated from moderateScale(15)
+    borderRadius: BorderRadius.medium, // Updated from moderateScale(10)
     width: '80%',
     alignItems: 'center',
   },
   buttonText: {
-    color: Colors.white,
+    color: Colors.text.primary, // Updated from Colors.white
     fontWeight: 'bold',
-    fontSize: moderateScale(16),
+    fontSize: Typography.button.fontSize, // Updated from moderateScale(16)
   },
   textContainer: {
     position: 'absolute',
     bottom: verticalScale(100),
     width: '90%',
-    backgroundColor: Colors.darkGrey,
-    borderRadius: moderateScale(10),
-    padding: moderateScale(15),
+    backgroundColor: Colors.background.card, // Updated from Colors.darkGrey
+    borderRadius: BorderRadius.medium, // Updated from moderateScale(10)
+    padding: Spacing.m, // Updated from moderateScale(15)
     maxHeight: verticalScale(200),
   },
   textTitle: {
-    color: Colors.white,
-    fontSize: moderateScale(16),
+    color: Colors.text.primary, // Updated from Colors.white
+    fontSize: Typography.body.large.fontSize, // Updated from moderateScale(16)
     fontWeight: 'bold',
-    marginBottom: verticalScale(8),
+    marginBottom: Spacing.s, // Updated from verticalScale(8)
   },
   textScroll: {
     maxHeight: verticalScale(150),
   },
   recognizedText: {
-    color: Colors.white,
-    fontSize: moderateScale(14),
-    lineHeight: moderateScale(20),
+    color: Colors.text.primary, // Updated from Colors.white
+    fontSize: Typography.body.medium.fontSize, // Updated from moderateScale(14)
+    lineHeight: Typography.body.medium.lineHeight, // Updated from moderateScale(20)
   }
 });

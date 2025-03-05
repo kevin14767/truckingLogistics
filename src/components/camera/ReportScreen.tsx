@@ -3,7 +3,15 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CameraStackParamList, VerificationData } from '@/src/types/camera_navigation';
-import { Colors, moderateScale, verticalScale, horizontalScale } from '../../../src/themes';
+import { 
+  Colors, 
+  moderateScale, 
+  verticalScale, 
+  horizontalScale,
+  Typography,
+  Spacing,
+  BorderRadius
+} from '@/src/themes';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
@@ -59,7 +67,7 @@ export default function ReportScreen() {
               <MaterialIcons
                 name={item.verified ? "check-circle" : "cancel"}
                 size={24}
-                color={item.verified ? Colors.greenThemeColor : Colors.grey}
+                color={item.verified ? Colors.status.success : Colors.text.secondary}
               />
             </View>
           ))}
@@ -78,74 +86,74 @@ export default function ReportScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black_grey,
+    backgroundColor: Colors.background.main,
   },
   header: {
-    padding: moderateScale(16),
+    padding: Spacing.m,
     marginTop: verticalScale(40),
     alignItems: 'center',
   },
   headerTitle: {
-    color: Colors.white,
-    fontSize: moderateScale(24),
+    color: Colors.text.primary,
+    fontSize: Typography.header.medium.fontSize,
     fontWeight: 'bold',
   },
   content: {
     flex: 1,
-    padding: moderateScale(16),
+    padding: Spacing.m,
   },
   section: {
     marginBottom: verticalScale(24),
   },
   sectionTitle: {
-    color: Colors.white,
-    fontSize: moderateScale(18),
+    color: Colors.text.primary,
+    fontSize: Typography.header.small.fontSize,
     fontWeight: '600',
-    marginBottom: verticalScale(12),
+    marginBottom: Spacing.m,
   },
   infoCard: {
-    backgroundColor: Colors.darkGrey,
-    padding: moderateScale(16),
-    borderRadius: moderateScale(10),
+    backgroundColor: Colors.background.card,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
   },
   infoText: {
-    color: Colors.white,
-    fontSize: moderateScale(14),
-    marginBottom: verticalScale(8),
+    color: Colors.text.primary,
+    fontSize: Typography.body.medium.fontSize,
+    marginBottom: Spacing.s,
   },
   resultItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: Colors.darkGrey,
-    padding: moderateScale(16),
-    borderRadius: moderateScale(10),
-    marginBottom: verticalScale(8),
+    backgroundColor: Colors.background.card,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
+    marginBottom: Spacing.s,
   },
   resultText: {
-    color: Colors.white,
-    fontSize: moderateScale(16),
+    color: Colors.text.primary,
+    fontSize: Typography.body.large.fontSize,
   },
   footer: {
-    padding: moderateScale(16),
+    padding: Spacing.m,
   },
   footerButton: {
-    backgroundColor: Colors.greenThemeColor,
-    padding: moderateScale(16),
-    borderRadius: moderateScale(10),
+    backgroundColor: Colors.primary.main,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
     alignItems: 'center',
   },
   footerButtonText: {
-    color: Colors.white,
-    fontSize: moderateScale(16),
+    color: Colors.text.primary,
+    fontSize: Typography.button.fontSize,
     fontWeight: 'bold',
   },
   textScroll: {
     maxHeight: verticalScale(120),
   },
   extractedText: {
-    color: Colors.white,
-    fontSize: moderateScale(14),
-    lineHeight: moderateScale(20),
+    color: Colors.text.primary,
+    fontSize: Typography.body.medium.fontSize,
+    lineHeight: Typography.body.medium.lineHeight,
   }
 });
