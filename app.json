@@ -61,12 +61,14 @@
       "tsconfigPaths": true
     },
     "extra": {
+      "anthropicApiKey": "process.env.ANTHROPIC_API_KEY",
       "router": {
         "origin": false
       },
       "eas": {
         "projectId": "e51bc337-3d5d-4e99-a19f-96fce61917de"
       }
+      
     }
   }
 }

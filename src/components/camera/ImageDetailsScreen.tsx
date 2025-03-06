@@ -1,8 +1,17 @@
 // src/components/camera/ImageDetailsScreen.tsx
-import React, { useState } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  View, 
+  Image, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Text, 
+  ScrollView, 
+  ActivityIndicator,
+  Animated,
+  Dimensions
+} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { CameraStackParamList } from '@/src/types/camera_navigation';
 import { 
   Colors, 
   moderateScale, 
@@ -10,81 +19,331 @@ import {
   horizontalScale,
   BorderRadius, 
   Spacing, 
-  Typography
+  Typography,
+  Shadow
 } from '@/src/themes';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import OCRProcessor from './OCRprocessor';
+import { AIClassificationService } from '@/src/services/AIClassificationService';
+import { AIClassifiedReceipt, Receipt } from '@/src/types/ReceiptInterfaces';
+import * as Haptics from 'expo-haptics';
+
+const { width } = Dimensions.get('window');
 
 export default function ImageDetailsScreen() {
-  const { uri } = useLocalSearchParams<CameraStackParamList['imagedetails']>();
+  const { uri } = useLocalSearchParams();
   const router = useRouter();
   const [recognizedText, setRecognizedText] = useState<string>('');
   const [showOCR, setShowOCR] = useState<boolean>(false);
+  const [isClassifying, setIsClassifying] = useState<boolean>(false);
+  const [classifiedData, setClassifiedData] = useState<AIClassifiedReceipt | null>(null);
   const { t } = useTranslation();
+  
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  
+  // Handle OCR recognition completion
+  const handleTextRecognized = async (text: string) => {
+    setRecognizedText(text);
+    setShowOCR(false);
+    
+    // Animate in the text container
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      })
+    ]).start();
+    
+    // Provide haptic feedback for completion
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
+    // Automatically start AI classification
+    await classifyText(text);
+  };
 
-  const handleVerification = () => {
-    const imageData = {
-      uri,
-      recognizedText
+  // Function to classify recognized text
+  const classifyText = async (text: string) => {
+    setIsClassifying(true);
+    try {
+      const classified = await AIClassificationService.classifyReceipt(text);
+      
+      // Ensure all required fields exist
+      const validatedClassification: AIClassifiedReceipt = {
+        date: classified?.date || new Date().toISOString().split('T')[0],
+        type: classified?.type || 'Other',
+        amount: classified?.amount || '$0.00',
+        vehicle: classified?.vehicle || 'Unknown Vehicle',
+        vendorName: classified?.vendorName || 'Unknown Vendor',
+        location: classified?.location || '',
+        confidence: classified?.confidence || 0.5
+      };
+      
+      setClassifiedData(validatedClassification);
+      
+      // Haptic feedback for classification completion
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Error classifying text:', error);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setIsClassifying(false);
+    }
+  };
+
+  // Start OCR processing
+  const startOCR = () => {
+    setShowOCR(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  };
+
+  // Navigate to verification screen
+  const handleContinue = () => {
+    if (!recognizedText) {
+      alert('Please extract the text first');
+      return;
+    }
+    
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
+    // Create default values for missing fields
+    const defaultReceipt: Partial<Receipt> = {
+      id: Date.now().toString(),
+      date: new Date().toISOString().split('T')[0],
+      type: 'Other',
+      amount: '$0.00',
+      vehicle: 'Unknown Vehicle',
+      status: 'Pending',
+      extractedText: recognizedText,
+      imageUri: uri as string,
+      timestamp: new Date().toISOString()
     };
+    
+    // Merge with classified data (if available)
+    const receiptData = classifiedData 
+      ? { ...defaultReceipt, ...classifiedData }
+      : defaultReceipt;
     
     router.push({
       pathname: '/camera/verification',
-      params: { imageData: JSON.stringify(imageData) }
+      params: { 
+        receipt: JSON.stringify(receiptData),
+        uri: uri as string 
+      }
     });
   };
 
-  const handleTextRecognized = (text: string) => {
-    setRecognizedText(text);
-    setShowOCR(false);
+  // Start OCR automatically when screen loads
+  useEffect(() => {
+    if (uri && !recognizedText) {
+      // Add a small delay for better UX
+      const timer = setTimeout(() => {
+        startOCR();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [uri]);
+
+  // Format currency amount with proper formatting
+  const formatCurrency = (amount: string | undefined) => {
+    // Handle undefined or empty string
+    if (!amount) return '$0.00';
+    
+    try {
+      // If it already has a currency symbol, return as is
+      if (amount.includes('$') || amount.includes('€') || amount.includes('£')) {
+        return amount;
+      }
+      
+      // Otherwise, format as USD
+      const amountNum = parseFloat(amount);
+      if (isNaN(amountNum)) return '$0.00';
+      
+      return `$${amountNum.toFixed(2)}`;
+    } catch (error) {
+      console.error('Error formatting currency:', error);
+      return '$0.00';
+    }
   };
 
-  const startOCR = () => {
-    setShowOCR(true);
+  // Get confidence level color
+  const getConfidenceColor = (confidence: number = 0) => {
+    if (confidence >= 0.8) return Colors.status.success;
+    if (confidence >= 0.6) return Colors.status.warning;
+    return Colors.status.error;
+  };
+
+  // Safe way to get properties with default values
+  const safeGetProperty = <T,>(obj: any, property: string, defaultValue: T): T => {
+    if (!obj) return defaultValue;
+    return (obj[property] !== undefined && obj[property] !== null) ? obj[property] : defaultValue;
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.backButton}
-        onPress={() => router.back()}
-      >
-        <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
-      </TouchableOpacity>
-      
-      <Image 
-        source={{ uri }} 
-        style={styles.image}
-        resizeMode="contain"
-      />
-      
-      {recognizedText ? (
-        <View style={styles.textContainer}>
-          <Text style={styles.textTitle}>{t('recognizedText')}</Text>
-          <ScrollView style={styles.textScroll}>
-            <Text style={styles.recognizedText}>{recognizedText}</Text>
-          </ScrollView>
-        </View>
-      ) : (
+      {/* Header */}
+      <View style={styles.header}>
         <TouchableOpacity 
-          style={styles.ocrButton}
-          onPress={startOCR}
+          style={styles.backButton}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.back();
+          }}
         >
-          <Text style={styles.buttonText}>{t('extractText', 'Extract Text')}</Text>
+          <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>{t('receiptScanner', 'Receipt Scanner')}</Text>
+        <View style={styles.rightHeaderPlaceholder} />
+      </View>
+      
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.contentContainer}>
+          {/* Image Container */}
+          <View style={styles.imageContainer}>
+            <Image 
+              source={{ uri: uri as string }} 
+              style={styles.image}
+              resizeMode="cover" 
+            />
+            {!recognizedText && (
+              <View style={styles.imagePlaceholder}>
+                <Text style={styles.imagePlaceholderText}>
+                  {t('tapToScan', 'Tap to scan receipt')}
+                </Text>
+              </View>
+            )}
+          </View>
+          
+          {/* Text Recognition Results */}
+          {recognizedText ? (
+            <Animated.View 
+              style={[
+                styles.textContainer,
+                {
+                  opacity: fadeAnim,
+                  transform: [{ translateY: slideAnim }]
+                }
+              ]}
+            >
+              <View style={styles.sectionHeader}>
+                <MaterialIcons name="document-scanner" size={20} color={Colors.primary.main} />
+                <Text style={styles.sectionTitle}>{t('recognizedText', 'Recognized Text')}</Text>
+              </View>
+              <ScrollView style={styles.textScroll}>
+                <Text style={styles.recognizedText}>{recognizedText}</Text>
+              </ScrollView>
+            </Animated.View>
+          ) : (
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={startOCR}
+            >
+              <MaterialIcons name="document-scanner" size={24} color={Colors.text.primary} />
+              <Text style={styles.buttonText}>{t('scanReceipt', 'Scan Receipt')}</Text>
+            </TouchableOpacity>
+          )}
+          
+          {/* Classification Results */}
+          {classifiedData && (
+            <View style={styles.classificationContainer}>
+              <View style={styles.sectionHeader}>
+                <MaterialIcons name="auto-awesome" size={20} color={Colors.primary.main} />
+                <Text style={styles.sectionTitle}>{t('aiClassification', 'AI Classification')}</Text>
+                <View style={[
+                  styles.confidenceBadge,
+                  { backgroundColor: getConfidenceColor(safeGetProperty(classifiedData, 'confidence', 0)) }
+                ]}>
+                  <Text style={styles.confidenceText}>
+                    {Math.round((safeGetProperty(classifiedData, 'confidence', 0) * 100))}%
+                  </Text>
+                </View>
+              </View>
+              
+              <View style={styles.classificationGrid}>
+                <View style={styles.classificationItem}>
+                  <Text style={styles.itemLabel}>{t('receiptType', 'Type')}</Text>
+                  <View style={styles.typeTag}>
+                    <Text style={styles.typeTagText}>
+                      {safeGetProperty(classifiedData, 'type', 'Other')}
+                    </Text>
+                  </View>
+                </View>
+                
+                <View style={styles.classificationItem}>
+                  <Text style={styles.itemLabel}>{t('amount', 'Amount')}</Text>
+                  <Text style={styles.itemValueLarge}>
+                    {formatCurrency(safeGetProperty(classifiedData, 'amount', ''))}
+                  </Text>
+                </View>
+                
+                <View style={styles.classificationItem}>
+                  <Text style={styles.itemLabel}>{t('date', 'Date')}</Text>
+                  <Text style={styles.itemValue}>
+                    {safeGetProperty(classifiedData, 'date', 'Unknown')}
+                  </Text>
+                </View>
+                
+                <View style={styles.classificationItem}>
+                  <Text style={styles.itemLabel}>{t('vendor', 'Vendor')}</Text>
+                  <Text style={styles.itemValue} numberOfLines={1}>
+                    {safeGetProperty(classifiedData, 'vendorName', 'Unknown Vendor')}
+                  </Text>
+                </View>
+                
+                <View style={styles.classificationItem}>
+                  <Text style={styles.itemLabel}>{t('vehicle', 'Vehicle')}</Text>
+                  <Text style={styles.itemValue}>
+                    {safeGetProperty(classifiedData, 'vehicle', 'Unknown Vehicle')}
+                  </Text>
+                </View>
+                
+                {safeGetProperty(classifiedData, 'location', '') && (
+                  <View style={styles.classificationItem}>
+                    <Text style={styles.itemLabel}>{t('location', 'Location')}</Text>
+                    <Text style={styles.itemValue} numberOfLines={1}>
+                      {safeGetProperty(classifiedData, 'location', '')}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
+          
+          {/* Classification Loading */}
+          {isClassifying && (
+            <View style={styles.classifyingContainer}>
+              <ActivityIndicator size="small" color={Colors.primary.main} />
+              <Text style={styles.classifyingText}>{t('analyzing', 'Analyzing receipt...')}</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+      
+      {/* Continue Button */}
+      {recognizedText && !isClassifying && (
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity 
+            style={styles.continueButton}
+            onPress={handleContinue}
+          >
+            <Text style={styles.buttonText}>{t('continue', 'Continue')}</Text>
+            <Feather name="arrow-right" size={20} color={Colors.text.primary} />
+          </TouchableOpacity>
+        </View>
       )}
       
-      <TouchableOpacity 
-        style={styles.verifyButton}
-        onPress={handleVerification}
-      >
-        <Text style={styles.buttonText}>{t('verifyImage')}</Text>
-      </TouchableOpacity>
-      
+      {/* OCR Processing Component */}
       {showOCR && (
         <OCRProcessor 
-          imageUri={uri} 
+          imageUri={uri as string} 
           onTextRecognized={handleTextRecognized} 
         />
       )}
@@ -95,67 +354,192 @@ export default function ImageDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.main, // Updated from Colors.black_grey
+    backgroundColor: Colors.background.main,
+  },
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.m,
+    paddingTop: verticalScale(60),
+    paddingBottom: Spacing.m,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.background.card,
+  },
+  headerTitle: {
+    color: Colors.text.primary,
+    fontSize: Typography.header.small.fontSize,
+    fontWeight: 'bold',
   },
   backButton: {
-    position: 'absolute',
-    top: verticalScale(50),
-    left: horizontalScale(20),
-    zIndex: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: Spacing.s, // Updated from moderateScale(8)
-    borderRadius: BorderRadius.pill, // Updated from moderateScale(20)
+    padding: Spacing.s,
+    borderRadius: BorderRadius.pill,
+    backgroundColor: Colors.background.card,
+  },
+  rightHeaderPlaceholder: {
+    width: 40,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  contentContainer: {
+    padding: Spacing.m,
+    paddingBottom: verticalScale(100),
+  },
+  imageContainer: {
+    width: '100%',
+    height: verticalScale(200),
+    borderRadius: BorderRadius.medium,
+    overflow: 'hidden',
+    marginBottom: Spacing.m,
+    backgroundColor: Colors.background.card,
+    ...Shadow.medium,
   },
   image: {
     width: '100%',
-    height: '50%',
-    marginTop: verticalScale(50),
+    height: '100%',
   },
-  verifyButton: {
+  imagePlaceholder: {
     position: 'absolute',
-    bottom: verticalScale(40),
-    backgroundColor: Colors.primary.main, // Updated from Colors.greenThemeColor
-    padding: Spacing.m, // Updated from moderateScale(15)
-    borderRadius: BorderRadius.medium, // Updated from moderateScale(10)
-    width: '80%',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
-  ocrButton: {
-    position: 'absolute',
-    bottom: verticalScale(100),
-    backgroundColor: Colors.background.card, // Updated from Colors.darkGrey
-    padding: Spacing.m, // Updated from moderateScale(15)
-    borderRadius: BorderRadius.medium, // Updated from moderateScale(10)
-    width: '80%',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: Colors.text.primary, // Updated from Colors.white
-    fontWeight: 'bold',
-    fontSize: Typography.button.fontSize, // Updated from moderateScale(16)
+  imagePlaceholderText: {
+    color: Colors.text.primary,
+    fontSize: Typography.body.medium.fontSize,
+    fontWeight: '500',
   },
   textContainer: {
-    position: 'absolute',
-    bottom: verticalScale(100),
-    width: '90%',
-    backgroundColor: Colors.background.card, // Updated from Colors.darkGrey
-    borderRadius: BorderRadius.medium, // Updated from moderateScale(10)
-    padding: Spacing.m, // Updated from moderateScale(15)
-    maxHeight: verticalScale(200),
+    width: '100%',
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.medium,
+    padding: Spacing.m,
+    marginBottom: Spacing.m,
+    ...Shadow.small,
   },
-  textTitle: {
-    color: Colors.text.primary, // Updated from Colors.white
-    fontSize: Typography.body.large.fontSize, // Updated from moderateScale(16)
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.s,
+  },
+  sectionTitle: {
+    color: Colors.text.primary,
+    fontSize: Typography.body.large.fontSize,
     fontWeight: 'bold',
-    marginBottom: Spacing.s, // Updated from verticalScale(8)
+    marginLeft: Spacing.xs,
   },
   textScroll: {
-    maxHeight: verticalScale(150),
+    maxHeight: verticalScale(100),
   },
   recognizedText: {
-    color: Colors.text.primary, // Updated from Colors.white
-    fontSize: Typography.body.medium.fontSize, // Updated from moderateScale(14)
-    lineHeight: Typography.body.medium.lineHeight, // Updated from moderateScale(20)
-  }
+    color: Colors.text.secondary,
+    fontSize: Typography.body.small.fontSize,
+    lineHeight: Typography.body.small.lineHeight * 1.2,
+  },
+  actionButton: {
+    backgroundColor: Colors.primary.main,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: Spacing.m,
+    ...Shadow.medium,
+  },
+  buttonText: {
+    color: Colors.text.primary,
+    fontWeight: 'bold',
+    fontSize: Typography.button.fontSize,
+    marginLeft: Spacing.s,
+  },
+  classificationContainer: {
+    width: '100%',
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.medium,
+    padding: Spacing.m,
+    marginBottom: Spacing.m,
+    ...Shadow.small,
+  },
+  classificationGrid: {
+    marginTop: Spacing.s,
+  },
+  classificationItem: {
+    marginBottom: Spacing.s,
+  },
+  itemLabel: {
+    color: Colors.text.secondary,
+    fontSize: Typography.body.small.fontSize,
+    marginBottom: Spacing.xs / 2,
+  },
+  itemValue: {
+    color: Colors.text.primary,
+    fontSize: Typography.body.medium.fontSize,
+    fontWeight: '500',
+  },
+  itemValueLarge: {
+    color: Colors.text.primary,
+    fontSize: Typography.header.small.fontSize,
+    fontWeight: 'bold',
+  },
+  typeTag: {
+    backgroundColor: Colors.primary.main,
+    paddingHorizontal: Spacing.s,
+    paddingVertical: Spacing.xs / 2,
+    borderRadius: BorderRadius.small,
+    alignSelf: 'flex-start',
+  },
+  typeTagText: {
+    color: Colors.text.primary,
+    fontSize: Typography.body.small.fontSize,
+    fontWeight: '600',
+  },
+  confidenceBadge: {
+    marginLeft: 'auto',
+    paddingHorizontal: Spacing.s,
+    paddingVertical: Spacing.xs / 2,
+    borderRadius: BorderRadius.pill,
+  },
+  confidenceText: {
+    color: Colors.background.main,
+    fontSize: Typography.body.small.fontSize,
+    fontWeight: '600',
+  },
+  classifyingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.m,
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.medium,
+    ...Shadow.small,
+  },
+  classifyingText: {
+    color: Colors.text.secondary,
+    marginLeft: Spacing.s,
+    fontSize: Typography.body.medium.fontSize,
+  },
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: Spacing.m,
+    backgroundColor: Colors.background.main,
+    borderTopWidth: 1,
+    borderTopColor: Colors.background.card,
+  },
+  continueButton: {
+    backgroundColor: Colors.primary.main,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Shadow.medium,
+  },
 });

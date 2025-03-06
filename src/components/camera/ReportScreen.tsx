@@ -1,8 +1,19 @@
 // src/components/camera/ReportScreen.tsx
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  ActivityIndicator, 
+  Alert, 
+  Share,
+  Image,
+  Animated,
+  Dimensions
+} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { CameraStackParamList, VerificationData } from '@/src/types/camera_navigation';
 import { 
   Colors, 
   moderateScale, 
@@ -10,73 +21,410 @@ import {
   horizontalScale,
   Typography,
   Spacing,
-  BorderRadius
+  BorderRadius,
+  Shadow
 } from '@/src/themes';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { Receipt } from '@/src/types/ReceiptInterfaces';
+import { DocumentStorage } from '@/src/services/DocumentStorage';
+import * as Haptics from 'expo-haptics';
+
+const { width } = Dimensions.get('window');
 
 export default function ReportScreen() {
-  const { verificationData } = useLocalSearchParams<CameraStackParamList['report']>();
+  const params = useLocalSearchParams();
   const router = useRouter();
   const { t } = useTranslation();
+  
+  // Parse the receipt data
+  const [receipt, setReceipt] = useState<Receipt | null>(
+    params.receipt ? JSON.parse(params.receipt as string) : null
+  );
+  
+  const [isStatusUpdating, setIsStatusUpdating] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
+  const [showFullText, setShowFullText] = useState(false);
+  
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  
+  // Animate components in on mount
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true
+      })
+    ]).start();
+  }, []);
+  
+  // Format date for display
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    
+    try {
+      // Try to parse as ISO date first
+      const date = new Date(dateString);
+      
+      // Check if valid date
+      if (isNaN(date.getTime())) {
+        // If not valid ISO date, just return as is
+        return dateString;
+      }
+      
+      return date.toLocaleDateString(undefined, { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric'
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
+  
+  // Format time for display
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      
+      // Check if valid date
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      
+      return date.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      return '';
+    }
+  };
+  
+  // Handle approval of the document
+  const handleApproveDocument = async () => {
+    if (!receipt?.id) return;
+    
+    setIsStatusUpdating(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
+    try {
+      const updated = await DocumentStorage.updateReceiptStatus(receipt.id, 'Approved');
+      if (updated) {
+        setReceipt(updated);
+        
+        // Success feedback
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        
+        Alert.alert(
+          t('success', 'Success'),
+          t('receiptApproved', 'Receipt has been approved successfully')
+        );
+      }
+    } catch (error) {
+      console.error('Error approving document:', error);
+      
+      // Error feedback
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      
+      Alert.alert(
+        t('error', 'Error'),
+        t('errorUpdatingStatus', 'Failed to update receipt status')
+      );
+    } finally {
+      setIsStatusUpdating(false);
+    }
+  };
+  
+  // Toggle full text display
+  const toggleFullText = () => {
+    setShowFullText(!showFullText);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+  
+  // Share document content
+  const handleShareDocument = async () => {
+    if (!receipt) return;
+    
+    setShareLoading(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
+    try {
+      // Create a simple text representation
+      const textContent = `
+📝 Receipt Report
+-----------------------
+🏢 Vendor: ${receipt.vendorName || 'Unknown'}
+💰 Amount: ${receipt.amount}
+📅 Date: ${formatDate(receipt.date)}
+🚚 Vehicle: ${receipt.vehicle}
+🔤 Type: ${receipt.type}
+📍 Location: ${receipt.location || 'Not specified'}
+📋 Status: ${receipt.status}
+-----------------------
+📝 Raw Text:
+${receipt.extractedText}
 
-  // Parse the verification data
-  const parsedData: any = verificationData ? 
-    JSON.parse(verificationData) : 
-    { verificationResults: [], imageData: null, timestamp: new Date().toISOString() };
-
+Generated by Trucking Logistics Pro
+      `;
+      
+      await Share.share({
+        message: textContent,
+        title: 'Receipt Report',
+      });
+      
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Error sharing document:', error);
+      
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      
+      Alert.alert(
+        t('error', 'Error'),
+        t('errorSharing', 'Failed to share the receipt')
+      );
+    } finally {
+      setShareLoading(false);
+    }
+  };
+  
+  // Go back to the reports screen
   const handleFinish = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push('/reports');
   };
+  
+  // Get appropriate icon for receipt type
+  const getReceiptTypeIcon = (type?: string) => {
+    switch (type?.toLowerCase()) {
+      case 'fuel': return 'local-gas-station';
+      case 'maintenance': return 'build';
+      default: return 'receipt';
+    }
+  };
+  
+  if (!receipt) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.primary.main} />
+        <Text style={styles.loadingText}>{t('loadingReceipt', 'Loading receipt...')}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('reportSummary', 'Report Summary')}</Text>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.back();
+          }}
+        >
+          <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{t('receiptReport', 'Receipt Report')}</Text>
+        <TouchableOpacity 
+          style={[styles.shareButton, shareLoading && styles.buttonDisabled]} 
+          onPress={handleShareDocument}
+          disabled={shareLoading}
+        >
+          {shareLoading ? (
+            <ActivityIndicator size="small" color={Colors.text.primary} />
+          ) : (
+            <Feather name="share" size={20} color={Colors.text.primary} />
+          )}
+        </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('documentDetails', 'Document Details')}</Text>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoText}>{t('reportId', 'Report ID')}: {Date.now()}</Text>
-            <Text style={styles.infoText}>
-              {t('date', 'Date')}: {new Date().toLocaleDateString()}
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.contentContainer}>
+          {/* Status Banner */}
+          <Animated.View 
+            style={[
+              styles.statusBanner,
+              receipt.status === 'Approved' ? styles.approvedBanner : styles.pendingBanner,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
+          >
+            <MaterialIcons 
+              name={receipt.status === 'Approved' ? "check-circle" : "pending"} 
+              size={24} 
+              color={receipt.status === 'Approved' ? Colors.status.success : Colors.status.warning} 
+            />
+            <Text style={styles.statusText}>
+              {receipt.status === 'Approved' 
+                ? t('approved', 'Approved') 
+                : t('pendingApproval', 'Pending Approval')}
             </Text>
-          </View>
-        </View>
-
-        {parsedData.imageData?.recognizedText && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('extractedText', 'Extracted Text')}</Text>
-            <View style={styles.infoCard}>
-              <ScrollView style={styles.textScroll}>
-                <Text style={styles.extractedText}>
-                  {parsedData.imageData.recognizedText}
-                </Text>
-              </ScrollView>
+          </Animated.View>
+          
+          {/* Receipt Header */}
+          <Animated.View 
+            style={[
+              styles.receiptCard,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
+          >
+            <View style={styles.receiptHeader}>
+              <View style={styles.receiptType}>
+                <MaterialIcons 
+                  name={getReceiptTypeIcon(receipt.type)} 
+                  size={24} 
+                  color={Colors.primary.main} 
+                />
+                <Text style={styles.receiptTypeText}>{receipt.type || 'Other'}</Text>
+              </View>
+              <View style={styles.receiptDate}>
+                <Text style={styles.dateText}>{formatDate(receipt.date)}</Text>
+                <Text style={styles.timeText}>{formatTime(receipt.timestamp)}</Text>
+              </View>
             </View>
-          </View>
-        )}
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('verificationResults', 'Verification Results')}</Text>
-          {parsedData.verificationResults.map((item: any) => (
-            <View key={item.id} style={styles.resultItem}>
-              <Text style={styles.resultText}>{item.title}</Text>
-              <MaterialIcons
-                name={item.verified ? "check-circle" : "cancel"}
-                size={24}
-                color={item.verified ? Colors.status.success : Colors.text.secondary}
+            
+            <View style={styles.divider} />
+            
+            {/* Main Receipt Content */}
+            <View style={styles.receiptContent}>
+              <Text style={styles.amountText}>{receipt.amount}</Text>
+              <Text style={styles.vendorText}>{receipt.vendorName || t('unknownVendor', 'Unknown Vendor')}</Text>
+              
+              <View style={styles.detailsGrid}>
+                <View style={styles.detailItem}>
+                  <Text style={styles.detailLabel}>{t('vehicle', 'Vehicle')}</Text>
+                  <Text style={styles.detailValue}>{receipt.vehicle}</Text>
+                </View>
+                
+                {receipt.location && (
+                  <View style={styles.detailItem}>
+                    <Text style={styles.detailLabel}>{t('location', 'Location')}</Text>
+                    <Text style={styles.detailValue} numberOfLines={2}>{receipt.location}</Text>
+                  </View>
+                )}
+                
+                <View style={styles.detailItem}>
+                  <Text style={styles.detailLabel}>{t('receiptId', 'Receipt ID')}</Text>
+                  <Text style={styles.detailValue}>{receipt.id.substring(0, 8)}</Text>
+                </View>
+              </View>
+            </View>
+          </Animated.View>
+          
+          {/* Raw Text Section */}
+          <Animated.View 
+            style={[
+              styles.rawTextCard,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
+          >
+            <TouchableOpacity 
+              style={styles.rawTextHeader}
+              onPress={toggleFullText}
+            >
+              <View style={styles.rawTextTitle}>
+                <Feather name="file-text" size={20} color={Colors.primary.main} />
+                <Text style={styles.rawTextTitleText}>{t('extractedText', 'Extracted Text')}</Text>
+              </View>
+              <Feather 
+                name={showFullText ? "chevron-up" : "chevron-down"} 
+                size={20} 
+                color={Colors.text.secondary} 
               />
+            </TouchableOpacity>
+            
+            <View style={[
+              styles.rawTextContent,
+              !showFullText && styles.rawTextContentCollapsed
+            ]}>
+              <Text style={styles.rawText}>
+                {receipt.extractedText || t('noTextExtracted', 'No text was extracted from this receipt.')}
+              </Text>
             </View>
-          ))}
+            
+            {!showFullText && receipt.extractedText && receipt.extractedText.length > 100 && (
+              <TouchableOpacity 
+                style={styles.showMoreButton}
+                onPress={toggleFullText}
+              >
+                <Text style={styles.showMoreText}>{t('showMore', 'Show More')}</Text>
+              </TouchableOpacity>
+            )}
+          </Animated.View>
+          
+          {/* Action Card */}
+          <Animated.View 
+            style={[
+              styles.actionCard,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
+          >
+            <Text style={styles.actionTitle}>{t('actions', 'Actions')}</Text>
+            
+            <View style={styles.actionButtons}>
+              {receipt.status === 'Pending' ? (
+                <TouchableOpacity 
+                  style={[styles.approveButton, isStatusUpdating && styles.buttonDisabled]} 
+                  onPress={handleApproveDocument}
+                  disabled={isStatusUpdating}
+                >
+                  {isStatusUpdating ? (
+                    <ActivityIndicator size="small" color={Colors.text.primary} />
+                  ) : (
+                    <>
+                      <MaterialIcons name="check-circle" size={20} color={Colors.text.primary} />
+                      <Text style={styles.buttonText}>{t('approve', 'Approve')}</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.approvedMessage}>
+                  <MaterialIcons name="check-circle" size={20} color={Colors.status.success} />
+                  <Text style={styles.approvedText}>{t('receiptApproved', 'Receipt Approved')}</Text>
+                </View>
+              )}
+              
+              <TouchableOpacity 
+                style={styles.shareActionButton}
+                onPress={handleShareDocument}
+              >
+                <Feather name="share-2" size={20} color={Colors.text.primary} />
+                <Text style={styles.buttonText}>{t('share', 'Share')}</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
         </View>
       </ScrollView>
 
+      {/* Footer */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton} onPress={handleFinish}>
-          <Text style={styles.footerButtonText}>{t('complete', 'Complete')}</Text>
+        <TouchableOpacity 
+          style={styles.doneButton} 
+          onPress={handleFinish}
+        >
+          <Text style={styles.buttonText}>{t('done', 'Done')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -88,72 +436,269 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background.main,
   },
-  header: {
-    padding: Spacing.m,
-    marginTop: verticalScale(40),
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: Colors.background.main,
+  },
+  loadingText: {
+    color: Colors.text.primary,
+    marginTop: Spacing.m,
+    fontSize: Typography.body.medium.fontSize,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.m,
+    paddingTop: verticalScale(60),
+    paddingBottom: Spacing.m,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.background.card,
+  },
+  backButton: {
+    padding: Spacing.s,
+    borderRadius: BorderRadius.pill,
+    backgroundColor: Colors.background.card,
+  },
+  shareButton: {
+    padding: Spacing.s,
+    borderRadius: BorderRadius.pill,
+    backgroundColor: Colors.background.card,
   },
   headerTitle: {
     color: Colors.text.primary,
-    fontSize: Typography.header.medium.fontSize,
+    fontSize: Typography.header.small.fontSize,
     fontWeight: 'bold',
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  contentContainer: {
     padding: Spacing.m,
+    paddingBottom: verticalScale(100),
   },
-  section: {
-    marginBottom: verticalScale(24),
-  },
-  sectionTitle: {
-    color: Colors.text.primary,
-    fontSize: Typography.header.small.fontSize,
-    fontWeight: '600',
-    marginBottom: Spacing.m,
-  },
-  infoCard: {
-    backgroundColor: Colors.background.card,
+  statusBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: Spacing.m,
     borderRadius: BorderRadius.medium,
+    marginBottom: Spacing.m,
+    ...Shadow.small,
   },
-  infoText: {
-    color: Colors.text.primary,
+  approvedBanner: {
+    backgroundColor: Colors.status.success + '22', // Add transparency
+    borderWidth: 1,
+    borderColor: Colors.status.success,
+  },
+  pendingBanner: {
+    backgroundColor: Colors.status.warning + '22', // Add transparency
+    borderWidth: 1,
+    borderColor: Colors.status.warning,
+  },
+  statusText: {
     fontSize: Typography.body.medium.fontSize,
-    marginBottom: Spacing.s,
+    fontWeight: '600',
+    marginLeft: Spacing.s,
+    color: Colors.text.primary,
   },
-  resultItem: {
+  receiptCard: {
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.medium,
+    padding: Spacing.m,
+    marginBottom: Spacing.m,
+    ...Shadow.medium,
+  },
+  receiptHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: Colors.background.card,
-    padding: Spacing.m,
-    borderRadius: BorderRadius.medium,
     marginBottom: Spacing.s,
   },
-  resultText: {
+  receiptType: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  receiptTypeText: {
     color: Colors.text.primary,
     fontSize: Typography.body.large.fontSize,
+    fontWeight: '600',
+    marginLeft: Spacing.xs,
   },
-  footer: {
+  receiptDate: {
+    alignItems: 'flex-end',
+  },
+  dateText: {
+    color: Colors.text.primary,
+    fontSize: Typography.body.medium.fontSize,
+  },
+  timeText: {
+    color: Colors.text.secondary,
+    fontSize: Typography.body.small.fontSize,
+    marginTop: 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.background.elevated,
+    marginVertical: Spacing.s,
+  },
+  receiptContent: {
+    paddingVertical: Spacing.s,
+  },
+  amountText: {
+    fontSize: Typography.header.large.fontSize,
+    fontWeight: 'bold',
+    color: Colors.text.primary,
+    marginBottom: Spacing.xs,
+  },
+  vendorText: {
+    fontSize: Typography.body.large.fontSize,
+    color: Colors.text.primary,
+    marginBottom: Spacing.m,
+  },
+  detailsGrid: {
+    marginTop: Spacing.s,
+  },
+  detailItem: {
+    marginBottom: Spacing.s,
+  },
+  detailLabel: {
+    color: Colors.text.secondary,
+    fontSize: Typography.body.small.fontSize,
+    marginBottom: 2,
+  },
+  detailValue: {
+    color: Colors.text.primary,
+    fontSize: Typography.body.medium.fontSize,
+    fontWeight: '500',
+  },
+  rawTextCard: {
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.medium,
+    marginBottom: Spacing.m,
+    overflow: 'hidden',
+    ...Shadow.small,
+  },
+  rawTextHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.m,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.background.elevated,
+  },
+  rawTextTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rawTextTitleText: {
+    color: Colors.text.primary,
+    fontSize: Typography.body.large.fontSize,
+    fontWeight: '600',
+    marginLeft: Spacing.xs,
+  },
+  rawTextContent: {
     padding: Spacing.m,
   },
-  footerButton: {
+  rawTextContentCollapsed: {
+    maxHeight: verticalScale(100),
+    overflow: 'hidden',
+  },
+  rawText: {
+    color: Colors.text.secondary,
+    fontSize: Typography.body.small.fontSize,
+    lineHeight: Typography.body.small.lineHeight * 1.2,
+  },
+  showMoreButton: {
+    alignItems: 'center',
+    padding: Spacing.s,
+    backgroundColor: Colors.background.elevated,
+  },
+  showMoreText: {
+    color: Colors.primary.main,
+    fontSize: Typography.body.small.fontSize,
+    fontWeight: '600',
+  },
+  actionCard: {
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.medium,
+    padding: Spacing.m,
+    ...Shadow.small,
+  },
+  actionTitle: {
+    color: Colors.text.primary,
+    fontSize: Typography.body.large.fontSize,
+    fontWeight: '600',
+    marginBottom: Spacing.m,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: Spacing.s,
+  },
+  approveButton: {
+    flex: 1,
+    backgroundColor: Colors.status.success,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    ...Shadow.small,
+  },
+  shareActionButton: {
+    flex: 1,
+    backgroundColor: Colors.background.elevated,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    ...Shadow.small,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  buttonText: {
+    color: Colors.text.primary,
+    fontSize: Typography.button.fontSize,
+    fontWeight: 'bold',
+    marginLeft: Spacing.xs,
+  },
+  approvedMessage: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.background.elevated,
+    padding: Spacing.m,
+    borderRadius: BorderRadius.medium,
+  },
+  approvedText: {
+    color: Colors.status.success,
+    marginLeft: Spacing.xs,
+    fontSize: Typography.body.medium.fontSize,
+    fontWeight: '500',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: Spacing.m,
+    backgroundColor: Colors.background.main,
+    borderTopWidth: 1,
+    borderTopColor: Colors.background.card,
+    ...Shadow.large,
+  },
+  doneButton: {
     backgroundColor: Colors.primary.main,
     padding: Spacing.m,
     borderRadius: BorderRadius.medium,
     alignItems: 'center',
-  },
-  footerButtonText: {
-    color: Colors.text.primary,
-    fontSize: Typography.button.fontSize,
-    fontWeight: 'bold',
-  },
-  textScroll: {
-    maxHeight: verticalScale(120),
-  },
-  extractedText: {
-    color: Colors.text.primary,
-    fontSize: Typography.body.medium.fontSize,
-    lineHeight: Typography.body.medium.lineHeight,
+    justifyContent: 'center',
+    ...Shadow.medium,
   }
-});
+})
