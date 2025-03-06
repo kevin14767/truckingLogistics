@@ -1,6 +1,6 @@
 // app/(app)/settings/_layout.tsx
 import { Stack } from 'expo-router';
-import { Colors } from '../../../src/themes';
+import { Colors } from '@/src/themes';
 
 export default function SettingsLayout() {
   return (

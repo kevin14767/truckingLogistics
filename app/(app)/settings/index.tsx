@@ -1,4 +1,4 @@
-// app/(app)/settings.tsx
+// app/(app)/settings/index.tsx
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -11,16 +11,24 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { Colors, horizontalScale, verticalScale, moderateScale } from '../../../src/themes';
+import { 
+  Colors, 
+  Typography, 
+  Spacing, 
+  BorderRadius,
+  Shadow,
+  horizontalScale, 
+  verticalScale, 
+  moderateScale 
+} from '@/src/themes';
 import { useRouter } from "expo-router";
 import { useTranslation } from 'react-i18next';
-import { setLanguage } from '../../../src/i18n';
-import { useAuth } from '../../../src/context/AuthContext';
+import { setLanguage } from '@/src/i18n';
+import { useAuth } from '@/src/context/AuthContext';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { TouchableRipple } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 
-// Add before your component:
 const AnimatedSwitch = Animated.createAnimatedComponent(Switch);
 
 export default function Settings() {
@@ -62,7 +70,6 @@ export default function Settings() {
     }
   };
 
-  // Keep your existing helper functions
   const getLocation = () => {
     if (!userData) return t('unknownLocation');
     const { city = '', state = '' } = userData;
@@ -92,7 +99,7 @@ export default function Settings() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black_grey }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background.main }}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t('settings')}</Text>
@@ -112,7 +119,7 @@ export default function Settings() {
               onPress={() => router.push("/(app)/settings/edit")}>
               <View style={styles.profileAction}>
                 <Text style={styles.profileActionText}>{t('editProfile')}</Text>
-                <Feather color="#fff" name="edit" size={16} />
+                <Feather color={Colors.text.primary} name="edit" size={16} />
               </View>
             </TouchableOpacity>
 
@@ -122,9 +129,9 @@ export default function Settings() {
                   {isLoggingOut ? t('loggingOut') : t('logOut')}
                 </Text>
                 {isLoggingOut ? (
-                  <ActivityIndicator size="small" color={Colors.white} />
+                  <ActivityIndicator size="small" color={Colors.text.primary} />
                 ) : (
-                  <Feather color="#fff" name="log-out" size={16} />
+                  <Feather color={Colors.text.primary} name="log-out" size={16} />
                 )}
               </View>
             </TouchableOpacity>
@@ -142,18 +149,18 @@ export default function Settings() {
                 >
                   <>
                     <View style={[styles.rowIcon, { backgroundColor: '#fe9400' }]}>
-                      <Feather color="#29292b" name="globe" size={20} />
+                      <Feather color={Colors.background.card} name="globe" size={20} />
                     </View>
                     <Text style={styles.rowLabel}>{t('languagePreference')}</Text>
                     <View style={styles.rowSpacer} />
                     {isLanguageLoading ? (
-                      <ActivityIndicator size="small" color={Colors.greenThemeColor} />
+                      <ActivityIndicator size="small" color={Colors.primary.main} />
                     ) : (
                       <>
                         <Text style={styles.rowValue}>
                           {i18n.language === 'en' ? t('english') : t('spanish')}
                         </Text>
-                        <Feather color="#C6C6C6" name="chevron-right" size={20} />
+                        <Feather color={Colors.text.secondary} name="chevron-right" size={20} />
                       </>
                     )}
                   </>
@@ -163,7 +170,7 @@ export default function Settings() {
               <View style={styles.rowWrapper}>
                 <View style={styles.row}>
                   <View style={[styles.rowIcon, { backgroundColor: '#007AFF' }]}>
-                    <Feather color="#29292b" name="moon" size={20} />
+                    <Feather color={Colors.background.card} name="moon" size={20} />
                   </View>
                   <Text style={styles.rowLabel}>{t('darkMode')}</Text>
                   <View style={styles.rowSpacer} />
@@ -181,7 +188,7 @@ export default function Settings() {
               <View style={styles.rowWrapper}>
                 <View style={styles.row}>
                   <View style={[styles.rowIcon, { backgroundColor: '#32c759' }]}>
-                    <Feather color="#29292b" name="navigation" size={20} />
+                    <Feather color={Colors.background.card} name="navigation" size={20} />
                   </View>
                   <Text style={styles.rowLabel}>{t('location')}</Text>
                   <View style={styles.rowSpacer} />
@@ -198,7 +205,7 @@ export default function Settings() {
               <View style={[styles.rowWrapper, styles.rowFirst]}>
                 <View style={styles.row}>
                   <View style={[styles.rowIcon, { backgroundColor: '#38C959' }]}>
-                    <Feather color="#29292b" name="at-sign" size={20} />
+                    <Feather color={Colors.background.card} name="at-sign" size={20} />
                   </View>
                   <Text style={styles.rowLabel}>{t('emailNotifications')}</Text>
                   <View style={styles.rowSpacer} />
@@ -216,7 +223,7 @@ export default function Settings() {
               <View style={styles.rowWrapper}>
                 <View style={styles.row}>
                   <View style={[styles.rowIcon, { backgroundColor: '#38C959' }]}>
-                    <Feather color="#29292b" name="bell" size={20} />
+                    <Feather color={Colors.background.card} name="bell" size={20} />
                   </View>
                   <Text style={styles.rowLabel}>{t('pushNotifications')}</Text>
                   <View style={styles.rowSpacer} />
@@ -240,137 +247,129 @@ export default function Settings() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.black_grey,
-    paddingVertical: verticalScale(24),
+    backgroundColor: Colors.background.main,
+    paddingVertical: Spacing.l,
     flex: 1,
   },
   header: {
-    paddingHorizontal: horizontalScale(24),
-    marginBottom: verticalScale(20),
+    paddingHorizontal: Spacing.l,
+    marginBottom: Spacing.m,
   },
   headerTitle: {
-    fontSize: moderateScale(34),
+    fontSize: Typography.header.medium.fontSize,
     fontWeight: '800',
-    color: Colors.white,
+    color: Colors.text.primary,
     letterSpacing: 0.5,
   },
   headerSubtitle: {
-    fontSize: moderateScale(16),
-    color: Colors.grey,
-    marginTop: verticalScale(8),
+    fontSize: Typography.body.large.fontSize,
+    color: Colors.text.secondary,
+    marginTop: Spacing.xs,
   },
   profile: {
-    padding: moderateScale(24),
+    padding: Spacing.l,
     alignItems: 'center',
-    backgroundColor: Colors.darkGrey,
-    borderRadius: moderateScale(16),
-    marginHorizontal: horizontalScale(16),
-    marginBottom: verticalScale(24),
-    marginTop: verticalScale(10), // Added top margin
-    elevation: 2,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.large,
+    marginHorizontal: Spacing.m,
+    marginBottom: Spacing.l,
+    marginTop: Spacing.xs,
+    ...Shadow.small,
   },
   avatar: {
     height: moderateScale(80),
     width: moderateScale(80),
-    borderRadius: moderateScale(40),
-    backgroundColor: Colors.greenThemeColor,
+    borderRadius: BorderRadius.circle(80),
+    backgroundColor: Colors.primary.main,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: Colors.greenThemeColor,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    ...Shadow.medium,
   },
   avatarText: {
-    fontSize: moderateScale(28),
-    color: Colors.white,
+    fontSize: Typography.header.small.fontSize,
+    color: Colors.text.primary,
     fontWeight: '700',
   },
   profileName: {
-    marginTop: verticalScale(16),
-    fontSize: moderateScale(24),
+    marginTop: Spacing.m,
+    fontSize: Typography.header.small.fontSize,
     fontWeight: '700',
-    color: Colors.white,
+    color: Colors.text.primary,
   },
   profileEmail: {
-    marginTop: verticalScale(8),
-    fontSize: moderateScale(16),
-    color: Colors.grey,
+    marginTop: Spacing.xs,
+    fontSize: Typography.body.large.fontSize,
+    color: Colors.text.secondary,
   },
   profileAction: {
-    marginTop: verticalScale(12),
-    paddingVertical: verticalScale(10),
-    paddingHorizontal: horizontalScale(16),
+    marginTop: Spacing.m,
+    paddingVertical: Spacing.s,
+    paddingHorizontal: Spacing.m,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.greenThemeColor,
-    borderRadius: moderateScale(12),
+    backgroundColor: Colors.primary.main,
+    borderRadius: BorderRadius.medium,
     minWidth: horizontalScale(120),
-    gap: horizontalScale(8),
+    gap: Spacing.xs,
   },
   profileActionText: {
-    fontSize: moderateScale(15),
+    fontSize: Typography.body.large.fontSize,
     fontWeight: '600',
-    color: Colors.white,
+    color: Colors.text.primary,
   },
   section: {
-    marginBottom: verticalScale(24),
+    marginBottom: Spacing.l,
   },
   sectionTitle: {
-    marginBottom: verticalScale(12),
-    marginHorizontal: horizontalScale(24),
-    fontSize: moderateScale(15),
+    marginBottom: Spacing.m,
+    marginHorizontal: Spacing.l,
+    fontSize: Typography.body.medium.fontSize,
     fontWeight: '600',
-    color: Colors.grey,
+    color: Colors.text.secondary,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   sectionBody: {
-    backgroundColor: Colors.darkGrey,
-    borderRadius: moderateScale(16),
-    marginHorizontal: horizontalScale(16),
-    paddingLeft: horizontalScale(16),
+    backgroundColor: Colors.background.card,
+    borderRadius: BorderRadius.large,
+    marginHorizontal: Spacing.m,
+    paddingLeft: Spacing.m,
     overflow: 'hidden',
   },
   row: {
-    paddingVertical: verticalScale(16),
-    paddingRight: horizontalScale(16),
+    paddingVertical: Spacing.m,
+    paddingRight: Spacing.m,
     flexDirection: 'row',
     alignItems: 'center',
-    height: verticalScale(70), // Increased height for better text visibility
-    minHeight: verticalScale(60), // Added minimum height
-
+    height: verticalScale(70),
+    minHeight: verticalScale(60),
   },
   rowWrapper: {
     borderTopWidth: 1,
-    borderColor: Colors.transParent,
+    borderColor: Colors.gray.transparent,
     backdropFilter: 'blur(10px)',
   },
   rowFirst: {
     borderTopWidth: 0,
   },
   rowLabel: {
-    fontSize: moderateScale(16),
+    fontSize: Typography.body.large.fontSize,
     fontWeight: '500',
-    color: Colors.white,
+    color: Colors.text.primary,
     flex: 1,
-    flexWrap: 'wrap', // Allow text to wrap
+    flexWrap: 'wrap',
   },
   rowValue: {
-    fontSize: moderateScale(16),
-    color: Colors.grey,
-    marginRight: horizontalScale(8),
+    fontSize: Typography.body.large.fontSize,
+    color: Colors.text.secondary,
+    marginRight: Spacing.xs,
   },
   rowIcon: {
-    marginRight: horizontalScale(16),
+    marginRight: Spacing.m,
     width: moderateScale(36),
     height: moderateScale(36),
-    borderRadius: moderateScale(10),
+    borderRadius: BorderRadius.small,
     justifyContent: 'center',
     alignItems: 'center',
     transform: [{ scale: 1.1 }],
@@ -379,8 +378,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settingLabel: {
-    fontSize: moderateScale(13),
-    color: Colors.grey,
-    marginTop: verticalScale(4),
+    fontSize: Typography.body.small.fontSize,
+    color: Colors.text.secondary,
+    marginTop: Spacing.xs,
   }
 });

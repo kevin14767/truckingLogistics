@@ -1,17 +1,25 @@
 // app/(app)/settings/edit.tsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput, Alert,
-  ScrollView, SafeAreaView, ActivityIndicator, KeyboardAvoidingView,
-  Platform, Animated, Keyboard
+  ScrollView, SafeAreaView
 } from "react-native";
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { Colors, moderateScale, horizontalScale, verticalScale } from '../../../src/themes';
+import { 
+  Colors, 
+  Typography, 
+  Spacing, 
+  BorderRadius,
+  Shadow,
+  moderateScale, 
+  horizontalScale, 
+  verticalScale 
+} from '@/src/themes';
 import FormButton from "@/src/components/forms/FormButton";
 import { useRouter } from "expo-router";
-import { useAuth } from "../../../src/context/AuthContext";
+import { useAuth } from "@/src/context/AuthContext";
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
-import { db } from '../../../src/context/AuthContext';
+import { db } from '@/src/context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 
@@ -50,7 +58,7 @@ export default function EditScreen() {
   }, []);
 
   const getUser = async () => {
-    if (!user) return; // Add null check
+    if (!user) return;
     try {
       const documentSnapshot = await getDoc(doc(db, 'users', user.uid));
       if (documentSnapshot.exists()) {
@@ -62,7 +70,7 @@ export default function EditScreen() {
   };
 
   const handleUpdate = async () => {
-    if (!user) return; // Add null check
+    if (!user) return;
   
     try {
       await updateDoc(doc(db, 'users', user.uid), {
@@ -102,7 +110,7 @@ export default function EditScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Feather name="arrow-left" size={25} color={Colors.white} />
+        <Feather name="arrow-left" size={25} color={Colors.text.primary} />
       </TouchableOpacity>
       
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -115,10 +123,10 @@ export default function EditScreen() {
           </View>
 
           <View style={styles.action}>
-            <FontAwesome name="user-o" size={20} color={Colors.grey} />
+            <FontAwesome name="user-o" size={20} color={Colors.text.secondary} />
             <TextInput
               placeholder={t('firstName')}
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor={Colors.text.secondary}
               value={userData?.fname || ''}
               onChangeText={(txt) => setUserData({ ...userData, fname: txt })}
               style={styles.textInput}
@@ -126,10 +134,10 @@ export default function EditScreen() {
           </View>
 
           <View style={styles.action}>
-            <FontAwesome name="user-o" size={20} color={Colors.grey} />
+            <FontAwesome name="user-o" size={20} color={Colors.text.secondary} />
             <TextInput
               placeholder={t('lastName')}
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor={Colors.text.secondary}
               value={userData?.lname || ''}
               onChangeText={(txt) => setUserData({ ...userData, lname: txt })}
               style={styles.textInput}
@@ -137,11 +145,11 @@ export default function EditScreen() {
           </View>
 
           <View style={styles.action}>
-            <FontAwesome name="phone" size={20} color={Colors.grey} />
+            <FontAwesome name="phone" size={20} color={Colors.text.secondary} />
             <TextInput
               placeholder={t('phone')}
               keyboardType="number-pad"
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor={Colors.text.secondary}
               value={userData?.phone || ''}
               onChangeText={(txt) => setUserData({ ...userData, phone: txt })}
               style={styles.textInput}
@@ -149,11 +157,11 @@ export default function EditScreen() {
           </View>
 
           <View style={styles.action}>
-            <FontAwesome name="envelope-o" size={20} color={Colors.grey} />
+            <FontAwesome name="envelope-o" size={20} color={Colors.text.secondary} />
             <TextInput
               placeholder={t('email')}
               keyboardType="email-address"
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor={Colors.text.secondary}
               value={userData?.email || ''}
               onChangeText={(txt) => setUserData({ ...userData, email: txt })}
               style={styles.textInput}
@@ -161,10 +169,10 @@ export default function EditScreen() {
           </View>
 
           <View style={styles.action}>
-            <FontAwesome name="globe" size={20} color={Colors.grey} />
+            <FontAwesome name="globe" size={20} color={Colors.text.secondary} />
             <TextInput
               placeholder={t('country')}
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor={Colors.text.secondary}
               value={userData?.country || ''}
               onChangeText={(txt) => setUserData({ ...userData, country: txt })}
               style={styles.textInput}
@@ -172,10 +180,10 @@ export default function EditScreen() {
           </View>
 
           <View style={styles.action}>
-            <Feather name="map-pin" size={20} color={Colors.grey} />
+            <Feather name="map-pin" size={20} color={Colors.text.secondary} />
             <TextInput
               placeholder={t('city')}
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor={Colors.text.secondary}
               value={userData?.city || ''}
               onChangeText={(txt) => setUserData({ ...userData, city: txt })}
               style={styles.textInput}
@@ -183,10 +191,10 @@ export default function EditScreen() {
           </View>
 
           <View style={styles.action}>
-            <Feather name="map" size={20} color={Colors.grey} />
+            <Feather name="map" size={20} color={Colors.text.secondary} />
             <TextInput
               placeholder={t('state')}
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor={Colors.text.secondary}
               value={userData?.state || ''}
               onChangeText={(txt) => setUserData({ ...userData, state: txt })}
               style={styles.textInput}
@@ -207,47 +215,41 @@ export default function EditScreen() {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: Colors.black_grey,
+      backgroundColor: Colors.background.main,
     },
     contentContainer: {
-      padding: moderateScale(20),
-      paddingBottom: moderateScale(40),
+      padding: Spacing.l,
+      paddingBottom: Spacing.xl,
     },
     backButton: {
-      padding: moderateScale(16),
-      marginLeft: horizontalScale(8),
+      padding: Spacing.m,
+      marginLeft: Spacing.xs,
     },
     profileSection: {
       alignItems: "center",
-      marginBottom: verticalScale(20),
+      marginBottom: Spacing.l,
     },
     imageContainer: {
       height: moderateScale(120),
       width: moderateScale(120),
-      borderRadius: moderateScale(60),
+      borderRadius: BorderRadius.circle(120),
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: Colors.greenThemeColor,
-      elevation: 4,
-      shadowColor: Colors.black,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      backgroundColor: Colors.primary.main,
+      ...Shadow.medium,
     },
     avatar: {
       height: moderateScale(120),
       width: moderateScale(120),
-      borderRadius: moderateScale(60),
-      backgroundColor: Colors.greenThemeColor,
+      borderRadius: BorderRadius.circle(120),
+      backgroundColor: Colors.primary.main,
       justifyContent: "center",
       alignItems: "center",
-      elevation: 4,
-      shadowColor: Colors.black,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      ...Shadow.medium,
     },
     avatarText: {
-      fontSize: moderateScale(42),
-      color: Colors.white,
+      fontSize: Typography.header.large.fontSize,
+      color: Colors.text.primary,
       fontWeight: "700",
     },
     imageBackground: {
@@ -255,39 +257,35 @@ const styles = StyleSheet.create({
       width: moderateScale(120),
     },
     imageStyle: {
-      borderRadius: moderateScale(60),
+      borderRadius: BorderRadius.circle(120),
     },
     userName: {
-      marginTop: verticalScale(16),
-      fontSize: moderateScale(24),
+      marginTop: Spacing.m,
+      fontSize: Typography.header.small.fontSize,
       fontWeight: "700",
-      color: Colors.white,
-      marginBottom: verticalScale(24),
+      color: Colors.text.primary,
+      marginBottom: Spacing.l,
     },
     action: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: Colors.darkGrey,
-      marginVertical: verticalScale(8),
-      borderRadius: moderateScale(12),
-      padding: moderateScale(16),
-      elevation: 2,
-      shadowColor: Colors.black,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
+      backgroundColor: Colors.background.card,
+      marginVertical: Spacing.xs,
+      borderRadius: BorderRadius.medium,
+      padding: Spacing.m,
+      ...Shadow.small,
     },
     textInput: {
       flex: 1,
-      paddingLeft: horizontalScale(12),
-      color: Colors.white,
-      fontSize: moderateScale(16),
+      paddingLeft: Spacing.m,
+      color: Colors.text.primary,
+      fontSize: Typography.body.large.fontSize,
     },
     updateButton: {
-      marginTop: verticalScale(24),
-      backgroundColor: Colors.greenThemeColor,
-      borderRadius: moderateScale(12),
-      padding: moderateScale(16),
-      marginBottom: moderateScale(32),
+      marginTop: Spacing.l,
+      backgroundColor: Colors.primary.main,
+      borderRadius: BorderRadius.medium,
+      padding: Spacing.m,
+      marginBottom: Spacing.l,
     }
-  });
-  
+});

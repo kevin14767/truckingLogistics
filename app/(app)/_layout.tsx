@@ -1,10 +1,18 @@
 // app/(app)/_layout.tsx
 import { Tabs } from 'expo-router';
 import { Image, View, Pressable, StyleSheet } from 'react-native';
-import { Colors, moderateScale, verticalScale, horizontalScale } from '../../src/themes';
+import { 
+  Colors, 
+  Typography, 
+  Spacing, 
+  BorderRadius,
+  Shadow,
+  moderateScale, 
+  verticalScale, 
+  horizontalScale 
+} from '@/src/themes';
 import TabBarIcon from '@/src/components/TabBarIcon';
 import { useTranslation } from 'react-i18next';
- 
 
 export default function TabLayout() {
   const { t } = useTranslation();
@@ -96,21 +104,17 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: Colors.black_grey,
+    backgroundColor: Colors.background.main, // Updated from Colors.black_grey
     height: verticalScale(90),
-    paddingTop: verticalScale(4),
+    paddingTop: Spacing.xs, // Updated from verticalScale(4)
     paddingBottom: verticalScale(22),
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     borderTopWidth: 2,
-    borderTopColor: Colors.darkGrey,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.2,
-    shadowRadius: moderateScale(5),
-    elevation: 10,
+    borderTopColor: Colors.background.card, // Updated from Colors.darkGrey
+    ...Shadow.medium, // Using predefined shadow instead of custom values
   },
   customTabButton: {
     top: verticalScale(-30),
@@ -120,19 +124,15 @@ const styles = StyleSheet.create({
   customTabButtonInner: {
     width: moderateScale(64),
     height: moderateScale(64),
-    borderRadius: moderateScale(32),
-    backgroundColor: Colors.greenThemeColor,
+    borderRadius: BorderRadius.circle(64), // Using theme function instead of hardcoded value
+    backgroundColor: Colors.primary.main, // Updated from Colors.greenThemeColor
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.35,
-    shadowRadius: moderateScale(5),
-    elevation: 10,
+    ...Shadow.large, // Using predefined shadow
   },
   cameraIcon: {
     width: moderateScale(32),
     height: moderateScale(32),
-    tintColor: Colors.white
+    tintColor: Colors.text.primary // Updated from Colors.white
   }
 });
