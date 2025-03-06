@@ -132,6 +132,7 @@ export default function ImageDetailsScreen() {
       ? { ...defaultReceipt, ...classifiedData }
       : defaultReceipt;
     
+    // Navigate to verification screen with receipt data and image URI
     router.push({
       pathname: '/camera/verification',
       params: { 
@@ -187,6 +188,7 @@ export default function ImageDetailsScreen() {
     return (obj[property] !== undefined && obj[property] !== null) ? obj[property] : defaultValue;
   };
 
+  // Simple solution with button inside ScrollView
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -324,21 +326,21 @@ export default function ImageDetailsScreen() {
               <Text style={styles.classifyingText}>{t('analyzing', 'Analyzing receipt...')}</Text>
             </View>
           )}
+          
+          {/* Continue Button */}
+          {recognizedText && !isClassifying && (
+            <View style={styles.buttonWrapper}>
+              <TouchableOpacity 
+                style={styles.continueButton}
+                onPress={handleContinue}
+              >
+                <Text style={styles.buttonText}>{t('continue', 'Continue')}</Text>
+                <Feather name="arrow-right" size={20} color={Colors.text.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
-      
-      {/* Continue Button */}
-      {recognizedText && !isClassifying && (
-        <View style={styles.bottomContainer}>
-          <TouchableOpacity 
-            style={styles.continueButton}
-            onPress={handleContinue}
-          >
-            <Text style={styles.buttonText}>{t('continue', 'Continue')}</Text>
-            <Feather name="arrow-right" size={20} color={Colors.text.primary} />
-          </TouchableOpacity>
-        </View>
-      )}
       
       {/* OCR Processing Component */}
       {showOCR && (
@@ -382,9 +384,16 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  buttonWrapper: {
+    marginTop: Spacing.l,  // Add good margin above the button
+    marginBottom: Spacing.xl, // Add margin below to ensure it's not cut off
+    paddingHorizontal: Spacing.m,
+  },
+  scrollViewContent: {
+    paddingBottom: verticalScale(120), // Add extra padding at bottom to allow scrolling content to be visible above the button
+  },
   contentContainer: {
     padding: Spacing.m,
-    paddingBottom: verticalScale(100),
   },
   imageContainer: {
     width: '100%',
@@ -532,6 +541,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background.main,
     borderTopWidth: 1,
     borderTopColor: Colors.background.card,
+    ...Shadow.large, // Added shadow for emphasis
+    zIndex: 10, // Ensure button appears above scroll content
   },
   continueButton: {
     backgroundColor: Colors.primary.main,
@@ -540,6 +551,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    // Make button more visible
+    borderWidth: 1,
+    borderColor: Colors.text.primary,
+    // Add shadow for better visibility
     ...Shadow.medium,
+    // These will work on iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    // This will work on Android
+    elevation: 5,
   },
 });

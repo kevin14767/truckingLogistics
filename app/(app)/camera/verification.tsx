@@ -1,11 +1,5 @@
 // app/camera/verification.tsx
 import VerificationScreen from '@/src/components/camera/VerificationScreen';
-import { CameraStackParamList } from '@/src/types/camera_navigation';
 
+// Simply export the component
 export default VerificationScreen;
-
-declare module 'expo-router' {
-  interface RouteParams {
-    verification: CameraStackParamList['verification'];
-  }
-}

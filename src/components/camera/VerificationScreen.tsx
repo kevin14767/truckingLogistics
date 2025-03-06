@@ -95,8 +95,11 @@ export default function VerificationScreen() {
         
         // Show alert with missing field
         Alert.alert(
-          t('missingInformation', 'Missing Information'),
-          t('pleaseEnterField', 'Please enter {{field}}', { field: t(field.toLowerCase(), field) })
+          // t('missingInformation', 'Missing Information'),
+          // t('pleaseEnterField', 'Please enter {{field}}', { field: t(field.toLowerCase(), field) })
+          'Missing Information',
+          'Please enter {{field}}'
+
         );
         
         setActiveField(field);
@@ -150,8 +153,10 @@ export default function VerificationScreen() {
       }).start();
       
       Alert.alert(
-        t('error', 'Error'),
-        t('errorSavingReceipt', 'Failed to save the receipt. Please try again.')
+        'Error',
+        'Failed to save the receipt. Please try again.'
+        // t('error', 'Error'),
+        // t('errorSavingReceipt', 'Failed to save the receipt. Please try again.')
       );
       
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -336,9 +341,9 @@ export default function VerificationScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
 
-        {/* Footer with Action Button */}
+
+          {/* Footer with Action Button */}
         <View style={styles.footer}>
           <TouchableOpacity 
             style={[styles.footerButton, isSaving && styles.footerButtonDisabled]} 
@@ -358,6 +363,28 @@ export default function VerificationScreen() {
             )}
           </TouchableOpacity>
         </View>
+        </ScrollView>
+
+        {/* Footer with Action Button
+        <View style={styles.footer}>
+          <TouchableOpacity 
+            style={[styles.footerButton, isSaving && styles.footerButtonDisabled]} 
+            onPress={handleSaveAndContinue}
+            disabled={isSaving}
+            activeOpacity={0.7}
+          >
+            {isSaving ? (
+              <ActivityIndicator size="small" color={Colors.text.primary} />
+            ) : (
+              <>
+                <Text style={styles.footerButtonText}>
+                  {t('saveAndContinue', 'Save and Continue')}
+                </Text>
+                <MaterialIcons name="check-circle" size={20} color={Colors.text.primary} />
+              </>
+            )}
+          </TouchableOpacity>
+        </View> */}
       </KeyboardAvoidingView>
       
       {/* Image Modal */}
