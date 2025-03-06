@@ -62,7 +62,10 @@ export default function TabLayout() {
           ),
           tabBarButton: (props) => (
             <Pressable
-              style={styles.customTabButton}
+              style={({ pressed }) => [
+                styles.customTabButton,
+                pressed && styles.customTabButtonPressed
+              ]}
               onPress={props.onPress}
             >
               <View style={styles.customTabButtonInner}>
@@ -104,35 +107,48 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: Colors.background.main, // Updated from Colors.black_grey
+    backgroundColor: Colors.background.main,
     height: verticalScale(90),
-    paddingTop: Spacing.xs, // Updated from verticalScale(4)
+    paddingTop: Spacing.xs,
     paddingBottom: verticalScale(22),
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     borderTopWidth: 2,
-    borderTopColor: Colors.background.card, // Updated from Colors.darkGrey
-    ...Shadow.medium, // Using predefined shadow instead of custom values
+    borderTopColor: Colors.background.card,
+    ...Shadow.medium,
   },
   customTabButton: {
     top: verticalScale(-30),
     justifyContent: 'center',
     alignItems: 'center',
+    height: moderateScale(80),
+    width: moderateScale(80),
+  },
+  customTabButtonPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }],
   },
   customTabButtonInner: {
     width: moderateScale(64),
     height: moderateScale(64),
-    borderRadius: BorderRadius.circle(64), // Using theme function instead of hardcoded value
-    backgroundColor: Colors.primary.main, // Updated from Colors.greenThemeColor
+    borderRadius: BorderRadius.circle(64),
+    backgroundColor: Colors.primary.main,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadow.large, // Using predefined shadow
+    elevation: 10, // Android shadow
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
   },
   cameraIcon: {
     width: moderateScale(32),
     height: moderateScale(32),
-    tintColor: Colors.text.primary // Updated from Colors.white
+    tintColor: Colors.text.primary
   }
 });
